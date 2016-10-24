@@ -22,13 +22,13 @@ namespace Schedule.Representation
             protected set;
         }
 
-        public uint Length
+        public int Length
         {
             get;
             set;
         }
 
-        public Task(string name, uint length, IEnumerable<Task> predecessors, IEnumerable<Skill> requiredSkills)
+        public Task(string name, int length, IEnumerable<Task> predecessors, IEnumerable<Skill> requiredSkills)
         {
             this.Name = name ?? Guid.NewGuid().ToString();
             this.Predecessors = new List<Task>();
@@ -46,15 +46,15 @@ namespace Schedule.Representation
             }
         }
 
-        public Task(string name, uint length) : this(name, length, null, null)
+        public Task(string name, int length) : this(name, length, null, null)
         {
         }
 
-        public Task(string name, uint length, IEnumerable<Task> predecessors) : this(name, length, predecessors, null)
+        public Task(string name, int length, IEnumerable<Task> predecessors) : this(name, length, predecessors, null)
         {
         }
 
-        public Task(string name, uint length, IEnumerable<Skill> requiredSkills) : this(name, length, null, requiredSkills)
+        public Task(string name, int length, IEnumerable<Skill> requiredSkills) : this(name, length, null, requiredSkills)
         {
         }
 

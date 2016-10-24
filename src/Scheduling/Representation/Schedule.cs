@@ -18,7 +18,7 @@ namespace Schedule.Representation
             }
         }
 
-        public uint Length
+        public int Length
         {
             get
             {
@@ -26,7 +26,7 @@ namespace Schedule.Representation
             }
         }
 
-        public void Add(Task task, Resource resource, uint offset)
+        public void Add(Task task, Resource resource, int offset)
         {
             TaskAssignment newAssignment = new TaskAssignment(task, resource, offset);
             this.tasks.Add(newAssignment);
@@ -58,7 +58,7 @@ namespace Schedule.Representation
             return assignments;
         }
 
-        public IEnumerable<TaskAssignment> RemoveAt(uint time)
+        public IEnumerable<TaskAssignment> RemoveAt(int time)
         {
             var assignments = this.GetTaskAt(time);
             this.tasks.RemoveAll(x => assignments.Contains(x));
@@ -66,7 +66,7 @@ namespace Schedule.Representation
             return assignments;
         }
 
-        public IEnumerable<TaskAssignment> GetTaskAt(uint time)
+        public IEnumerable<TaskAssignment> GetTaskAt(int time)
         {
             return this.tasks.Where(x => x.StartOffset >= time && x.EndOffset <= time);
         }

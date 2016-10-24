@@ -20,13 +20,13 @@ namespace Schedule.Representation
             set;
         }
 
-        public uint StartOffset
+        public int StartOffset
         {
             get;
             set;
         }
 
-        public uint EndOffset
+        public int EndOffset
         {
             get
             {
@@ -42,7 +42,7 @@ namespace Schedule.Representation
             }
         }
 
-        public uint Length
+        public int Length
         {
             get
             {
@@ -50,7 +50,7 @@ namespace Schedule.Representation
             }
         }
 
-        public TaskAssignment(Task task, Resource resource, uint offset)
+        public TaskAssignment(Task task, Resource resource, int offset)
         {
             if(task == null || resource == null)
             {
