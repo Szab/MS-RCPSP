@@ -27,13 +27,27 @@ namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
         {
             List<T> newPopulation = new List<T>();
 
+            Object addingLock = new Object();
+            List<Tuple<T, double>> qualities = new List<Tuple<T, double>>();
+
+            Parallel.ForEach(population, (item) =>
+            {       
+                double quality = item.RateQuality();
+                Tuple<T, double> qualityItem = new Tuple<T, double>(item, quality);
+
+                lock (addingLock)
+                {
+                    qualities.Add(qualityItem);
+                }
+            });
+
             int step = (int)Math.Ceiling((double)population.Count() / this.NumberOfGroups);
             int winnersInGroup = (int)Math.Ceiling((double)this.PopulationSize / this.NumberOfGroups);
 
             for(var i = 0; i < population.Count(); i = i + step)
             {
-                IEnumerable<T> subpopulation = population.Skip(i).Take(step).OrderByDescending(x => x.RateQuality())
-                                                .Take(winnersInGroup);
+                IEnumerable<T> subpopulation = qualities.Skip(i).Take(step).OrderByDescending(x => x.Item2)
+                                                .Take(winnersInGroup).Select(x => x.Item1);
 
                 newPopulation.AddRange(subpopulation);
             }

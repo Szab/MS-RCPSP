@@ -82,10 +82,11 @@ namespace Szab.EvolutionaryAlgorithm.Base
 
                 this.MutatePopulation(population, random);
                 this.CrossOverPopulation(population, random);
-                int populationSize = population.Count;
-                population.AddRange(this.SelectNewPopulation(population).Take(this.PopulationSize));
-                population.RemoveRange(0, populationSize);
 
+                int populationSize = population.Count;
+                IEnumerable<T> newPopulation = this.SelectNewPopulation(population).Take(this.PopulationSize);
+                population.Clear();
+                population.AddRange(newPopulation);
                 numGeneration++;
             }
 

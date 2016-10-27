@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MSRCPSP\MSRCPSPSolver.cs" />
+    <Compile Include="MSRCPSP\ScheduleBuilder.cs" />
     <Compile Include="MSRCPSP\ScheduleSpecimen.cs" />
     <Compile Include="Representation\ProjectSpecification.cs" />
     <Compile Include="Representation\TaskAssignment.cs" />
@@ -50,7 +51,6 @@
     <Compile Include="Representation\Task.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\FilesManager.cs" />
-    <Compile Include="MSRCPSP\ScheduleBuilder.cs" />
     <Compile Include="Tools\ListExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -26,19 +26,28 @@ namespace Szab.Scheduling.MSRCPSP
         {
             Schedule schedule = ScheduleBuilder.BuildScheduleFromSpecimen(this.ProjectData, this);
 
-            return 1 / (double)schedule.Length;
+            int length = schedule.Length;
+            double cost = schedule.SummaryCost;
+
+            return 1/(0.9 * (length/ProjectData.MaxDuration) + 0.1 * (cost/ProjectData.MaxCost));
         }
 
         public ScheduleSpecimen CrossOver(ScheduleSpecimen otherSpeciman)
         {
             ScheduleSpecimen child = new ScheduleSpecimen(this.ProjectData, this.Tasks.Length);
 
+            int numTasks = this.Tasks.Length;
             int skip = random.Next(this.Tasks.Length);
-            int take = random.Next(this.Tasks.Length);
+            int take = random.Next(this.Tasks.Length / 2);
+            int newPosition = random.Next(this.Tasks.Length);
 
             Task[] tasksToCopy = this.Tasks.Skip(skip).Take(take).ToArray();
 
-            tasksToCopy.CopyTo(child.Tasks, skip);
+            for (int i = 0, currentPosition = newPosition; i < tasksToCopy.Length; i++)
+            {
+                child.Tasks[newPosition] = tasksToCopy[i];
+                newPosition = (newPosition + 1) % numTasks;
+            }
 
             for (int i = 0; i < child.Tasks.Length; i++)
             {
@@ -51,6 +60,7 @@ namespace Szab.Scheduling.MSRCPSP
                         if (!child.Tasks.Contains(currentTask))
                         {
                             child.Tasks[i] = currentTask;
+                            break;
                         }
                     }
                 }
@@ -59,24 +69,19 @@ namespace Szab.Scheduling.MSRCPSP
             return child;
         }
 
-        // Mutation operator: inverting a random sequence
+        // Mutation operator: swapping random pairs
         public void Mutate()
         {
-            int startIndex = random.Next(this.Tasks.Length);
-            int endIndex = random.Next(this.Tasks.Length);
+            int pairs = random.Next(this.Tasks.Length);
 
-            if (startIndex < endIndex)
+            for(int i = 0; i < pairs; i++)
             {
-                int temp = startIndex;
-                startIndex = endIndex;
-                endIndex = startIndex;
-            }
+                int firstIndex = random.Next(this.Tasks.Length);
+                int secondIndex = random.Next(this.Tasks.Length);
 
-            for(int i = startIndex, j = endIndex; i < j; i++, j--)
-            {
-                Task temp = this.Tasks[i];
-                this.Tasks[i] = this.Tasks[j];
-                this.Tasks[j] = this.Tasks[i];
+                Task temp = this.Tasks[secondIndex];
+                this.Tasks[secondIndex] = this.Tasks[firstIndex];
+                this.Tasks[firstIndex] = temp;
             }
         }
 

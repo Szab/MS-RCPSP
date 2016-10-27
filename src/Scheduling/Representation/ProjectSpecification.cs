@@ -19,12 +19,11 @@ namespace Szab.Scheduling.Representation
             }
         }
 
-        public int MaxCost
+        public double MaxCost
         {
             get
             {
-                // TODO
-                return int.MaxValue;
+                return this.Tasks.Sum(x => x.AvailableResources.Max(y => y.Cost));
             }
         }
 

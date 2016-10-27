@@ -84,6 +84,11 @@ namespace Szab.Scheduling.Representation
             return this.tasks.Any(x => x.StartOffset >= time && x.EndOffset >= time);
         }
 
+        public bool ContainsTask(Task task)
+        {
+            return this.tasks.Any(x => x.Task == task);
+        }
+
         public TaskAssignment GetAssignmentByTask(Task task)
         {
             return this.tasks.Where(x => x.Task == task).FirstOrDefault();
@@ -96,19 +101,10 @@ namespace Szab.Scheduling.Representation
 
         public bool IsResourceAvailableAt(Resource resource, int time, int to)
         {
-            List<TaskAssignment> relevantAssignments = this.tasks.Where(x => x.Resource == resource).ToList();
-            bool isColliding = false;
-
-            for(int i = 0; !isColliding && i < relevantAssignments.Count; i++)
-            {
-                TaskAssignment assignment = relevantAssignments[i];
-                isColliding = (time <= assignment.StartOffset && to >= assignment.StartOffset ||
-                                    time <= assignment.EndOffset && to >= assignment.EndOffset ||
-                                    time >= assignment.StartOffset && to <= assignment.EndOffset ||
-                                    time <= assignment.StartOffset && to >= assignment.EndOffset);
-            }
-
-            return isColliding;
+            return !this.tasks.Any(x => x.Resource == resource && (time <= x.StartOffset && to >= x.StartOffset ||
+                                                                    time <= x.EndOffset && to >= x.EndOffset ||
+                                                                    time >= x.StartOffset && to <= x.EndOffset ||
+                                                                    time <= x.StartOffset && to >= x.EndOffset));
         }
 
         public bool Validate()

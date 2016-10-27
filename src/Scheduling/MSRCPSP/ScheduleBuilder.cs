@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Szab.Scheduling.Representation;
+using Szab.Scheduling.Tools;
 
 namespace Szab.Scheduling.MSRCPSP
 {
@@ -10,9 +11,10 @@ namespace Szab.Scheduling.MSRCPSP
     {
         private static Resource GetAvailableResourceForTask(ProjectSpecification projectData, Schedule schedule, int offset, Task task)
         {
-            IEnumerable<Resource> availableResources = task.AvailableResources;
+            List<Resource> availableResources = task.AvailableResources.ToList();
+            availableResources.Shuffle();
 
-            foreach(Resource resource in availableResources)
+            foreach (Resource resource in availableResources)
             {
                 bool isFree = schedule.IsResourceAvailableAt(resource, offset, offset + task.Length);
 
