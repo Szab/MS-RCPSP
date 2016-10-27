@@ -8,51 +8,17 @@ namespace Szab.Scheduling.MSRCPSP
 {
     public static class ScheduleBuilder
     {
-        private static bool CheckIfResourceIsValidForTask(Resource resource, Task task)
-        {
-            bool isValid = true;
-
-            for(int i = 0; i < task.RequiredSkills.Count && isValid; i++)
-            {
-                Skill requiredSkill = task.RequiredSkills[i];
-
-                for(int j = 0; j < resource.Skills.Count; j++)
-                {
-                    Skill ownedSkill = resource.Skills[j];
-
-                    if(ownedSkill.Name == requiredSkill.Name && ownedSkill.Level >= requiredSkill.Level)
-                    {
-                        isValid = true;
-                        break;
-                    }
-
-                    isValid = false;
-                }
-            }
-
-            return isValid;
-        }
-
         private static Resource GetAvailableResourceForTask(ProjectSpecification projectData, Schedule schedule, int offset, Task task)
         {
-            IEnumerable<Skill> requiredSkills = task.RequiredSkills;
-            List<Resource> resources = projectData.Resources.ToList();
+            IEnumerable<Resource> availableResources = task.AvailableResources;
 
-            for(int i = 0; i < resources.Count; i++)
+            foreach(Resource resource in availableResources)
             {
-                Resource currentResource = resources[i];
+                bool isFree = schedule.IsResourceAvailableAt(resource, offset, offset + task.Length);
 
-                bool isValid = ScheduleBuilder.CheckIfResourceIsValidForTask(currentResource, task);
-
-                if (isValid)
+                if (isFree)
                 {
-                    //bool isFree = schedule.IsResourceAvailableAt(currentResource, offset, offset + task.Length);
-
-                    //if (isFree)
-                    //{
-                    //    return currentResource;
-                    //}
-                    return currentResource;
+                    return resource;
                 }
             }
 

@@ -26,6 +26,16 @@ namespace Szab.Scheduling.Tools
             return fileContents;   
         }
 
+        private static void assignAvailableResources(ProjectSpecification project)
+        {
+            foreach(Task task in project.Tasks)
+            {
+                var matchingResources = project.Resources.Where(r => task.RequiredSkills.All(rs => r.Skills.Any(s => s.Name == rs.Name && s.Level >= rs.Level)));
+
+                task.AvailableResources.AddRange(matchingResources.OrderBy(r => r.Cost));
+            }
+        }
+
         private static Resource getResourceFromArray(string[] resourceData)
         {
             string name = resourceData[0];
@@ -119,7 +129,7 @@ namespace Szab.Scheduling.Tools
         public static ProjectSpecification ParseProjectData(string path)
         {
             string fileContent = FilesManager.readFile(path);
-            string[] sections = Regex.Split(fileContent, "=+\n");
+            string[] sections = Regex.Split(fileContent, "=+.+\n");
             int numSections = sections.Length;
 
             string tasksSection = String.IsNullOrEmpty(sections[numSections - 1]) ? sections[numSections - 2] : sections[numSections - 1];
@@ -129,7 +139,7 @@ namespace Szab.Scheduling.Tools
             FilesManager.parseResources(resourcesSection, projectSpecification);
             FilesManager.parseTasks(tasksSection, projectSpecification);
 
-            projectSpecification.SortData();
+            FilesManager.assignAvailableResources(projectSpecification);
 
             return projectSpecification;
         }

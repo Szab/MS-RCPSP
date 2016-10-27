@@ -11,12 +11,6 @@ namespace Szab.Scheduling.Representation
         public List<Task> Tasks { get; private set; }
         public List<Resource> Resources { get; private set; }
 
-        public void SortData()
-        {
-            this.Tasks = this.Tasks.OrderBy(x => x.Length).ToList();
-            this.Resources = this.Resources.OrderBy(x => x.Cost).ToList();
-        }
-
         public int MaxDuration
         {
             get

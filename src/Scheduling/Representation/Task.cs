@@ -22,6 +22,12 @@ namespace Szab.Scheduling.Representation
             protected set;
         }
 
+        public List<Resource> AvailableResources
+        {
+            get;
+            protected set;
+        }
+
         public int Length
         {
             get;
@@ -33,6 +39,7 @@ namespace Szab.Scheduling.Representation
             this.Name = name ?? Guid.NewGuid().ToString();
             this.Predecessors = new List<Task>();
             this.RequiredSkills = new List<Skill>();
+            this.AvailableResources = new List<Resource>();
             this.Length = length;
 
             if (predecessors != null)
