@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Schedule.Representation
+namespace Szab.Scheduling.Representation
 {
     public class Resource
     {

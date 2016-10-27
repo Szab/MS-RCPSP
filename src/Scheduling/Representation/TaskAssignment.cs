@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Schedule.Representation
+namespace Szab.Scheduling.Representation
 {
     public class TaskAssignment
     {
@@ -30,7 +30,7 @@ namespace Schedule.Representation
         {
             get
             {
-                return StartOffset + Length;
+                return StartOffset + this.Task.Length;
             }
         }
 
@@ -46,7 +46,7 @@ namespace Schedule.Representation
         {
             get
             {
-                return this.Task.Length + this.StartOffset;
+                return this.Task.Length;
             }
         }
 

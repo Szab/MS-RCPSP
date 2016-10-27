@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduling", "Scheduling\Sc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvolutionaryAlgorithm", "EvolutionaryAlgorithm\EvolutionaryAlgorithm.csproj", "{BC020B28-B2B1-4270-803D-A9E694A7F01A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{C9353A93-A496-45E0-BDC5-43985ACDF278}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BC020B28-B2B1-4270-803D-A9E694A7F01A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC020B28-B2B1-4270-803D-A9E694A7F01A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC020B28-B2B1-4270-803D-A9E694A7F01A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9353A93-A496-45E0-BDC5-43985ACDF278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9353A93-A496-45E0-BDC5-43985ACDF278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9353A93-A496-45E0-BDC5-43985ACDF278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9353A93-A496-45E0-BDC5-43985ACDF278}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Schedule.Representation
+namespace Szab.Scheduling.Representation
 {
     public class Schedule
     {
@@ -23,6 +23,14 @@ namespace Schedule.Representation
             get
             {
                 return this.tasks.Max(x => x.EndOffset);
+            }
+        }
+
+        public IEnumerable<TaskAssignment> Last
+        {
+            get
+            {
+                return this.tasks.Where(x => x.EndOffset == this.Length);
             }
         }
 
@@ -68,7 +76,29 @@ namespace Schedule.Representation
 
         public IEnumerable<TaskAssignment> GetTaskAt(int time)
         {
-            return this.tasks.Where(x => x.StartOffset >= time && x.EndOffset <= time);
+            return this.tasks.Where(x => x.StartOffset >= time && x.EndOffset >= time);
+        }
+
+        public bool HasTaskAt(int time)
+        {
+            return this.tasks.Any(x => x.StartOffset >= time && x.EndOffset >= time);
+        }
+
+        public TaskAssignment GetAssignmentByTask(Task task)
+        {
+            return this.tasks.Where(x => x.Task == task).FirstOrDefault();
+        }
+
+        public IEnumerable<TaskAssignment> GetAllAssignments()
+        {
+            return this.tasks.OrderBy(x => x.StartOffset);
+        }
+
+        public bool IsResourceAvailableAt(Resource resource, int time, int to)
+        {
+            return !this.tasks.Any(x => x.Resource == resource && (time <= x.StartOffset && time <= x.EndOffset && to >= x.StartOffset && to <= x.EndOffset ||
+                                                                   time >= x.StartOffset && time <= x.EndOffset && to >= x.StartOffset && to <= x.EndOffset ||
+                                                                   time >= x.StartOffset && time <= x.EndOffset && to >= x.StartOffset && to >= x.EndOffset));
         }
 
         public bool Validate()

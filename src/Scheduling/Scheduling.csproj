@@ -7,7 +7,7 @@
     <ProjectGuid>{D75E1D03-6360-4C8D-9B27-947BB0548A36}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Schedule</RootNamespace>
+    <RootNamespace>Szab.Scheduling</RootNamespace>
     <AssemblyName>Schedule</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -40,15 +40,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MSRCPSP\MSRCPSPSolver.cs" />
+    <Compile Include="MSRCPSP\ScheduleSpecimen.cs" />
+    <Compile Include="Representation\ProjectSpecification.cs" />
     <Compile Include="Representation\TaskAssignment.cs" />
     <Compile Include="Representation\Resource.cs" />
     <Compile Include="Representation\Schedule.cs" />
     <Compile Include="Representation\Skill.cs" />
     <Compile Include="Representation\Task.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tools\ScheduleBuilder.cs" />
+    <Compile Include="Tools\FilesManager.cs" />
+    <Compile Include="MSRCPSP\ScheduleBuilder.cs" />
+    <Compile Include="Tools\ListExtensions.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\EvolutionaryAlgorithm\EvolutionaryAlgorithm.csproj">
+      <Project>{bc020b28-b2b1-4270-803d-a9e694a7f01a}</Project>
+      <Name>EvolutionaryAlgorithm</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\EvolutionarySolver.cs" />
-    <Compile Include="Base\ISpeciman.cs" />
+    <Compile Include="Base\ISpecimen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectionSpecific\TopBestEvolutionarySolver.cs" />
     <Compile Include="SelectionSpecific\TournamentEvolutionarySolver.cs" />

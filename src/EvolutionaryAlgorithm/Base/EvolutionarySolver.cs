@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EvolutionaryAlgorithm.Base
+namespace Szab.EvolutionaryAlgorithm.Base
 {
-    public abstract class EvolutionarySolver<T> where T : class, ISpeciman<T>
+    public abstract class EvolutionarySolver<T> where T : class, ISpecimen<T>
     {
 
         private double mutationProbability;
@@ -33,13 +33,13 @@ namespace EvolutionaryAlgorithm.Base
             set;
         }
 
-        public abstract bool CheckIfFinished();
+        public abstract bool CheckIfFinished(int numGeneration, IEnumerable<T> population);
         public abstract IEnumerable<T> SelectNewPopulation(IEnumerable<T> population);
         public abstract IEnumerable<T> CreateInitialPopulation();
         
         protected void CrossOverPopulation(List<T> population, Random randomGenerator)
         {          
-            for (int i = 0; i < population.Count; i = i + 2)
+            for (int i = 0; i < population.Count - 1; i = i + 2)
             {
                 double rand = randomGenerator.NextDouble();
 
@@ -73,7 +73,7 @@ namespace EvolutionaryAlgorithm.Base
             List<T> population = this.CreateInitialPopulation().ToList();
             Random random = new Random(Guid.NewGuid().GetHashCode());
             
-            while (!this.CheckIfFinished())
+            while (!this.CheckIfFinished(numGeneration, population))
             {
                 if (this.OnNextGeneration != null)
                 {
@@ -82,7 +82,11 @@ namespace EvolutionaryAlgorithm.Base
 
                 this.MutatePopulation(population, random);
                 this.CrossOverPopulation(population, random);
-                population = this.SelectNewPopulation(population).Take(this.PopulationSize).ToList();
+                int populationSize = population.Count;
+                population.AddRange(this.SelectNewPopulation(population).Take(this.PopulationSize));
+                population.RemoveRange(0, populationSize);
+
+                numGeneration++;
             }
 
             return population.Aggregate((x, y) => x.RateQuality() > y.RateQuality() ? x : y);

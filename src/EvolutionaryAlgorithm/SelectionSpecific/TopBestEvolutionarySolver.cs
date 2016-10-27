@@ -1,13 +1,13 @@
-﻿using EvolutionaryAlgorithm.Base;
+﻿using Szab.EvolutionaryAlgorithm.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EvolutionaryAlgorithm.SelectionSpecific
+namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
 {
-    public abstract class TopBestEvolutionarySolver<T> : EvolutionarySolver<T> where T : class, ISpeciman<T>
+    public abstract class TopBestEvolutionarySolver<T> : EvolutionarySolver<T> where T : class, ISpecimen<T>
     {
         public override IEnumerable<T> SelectNewPopulation(IEnumerable<T> population)
         {
