@@ -14,44 +14,30 @@ namespace Application
     {
         static void Main(string[] args)
         {
-            List<double> worst = new List<double>();
-            List<double> average = new List<double>();
-            List<double> best = new List<double>();
+            List<double[]> partialQualities = new List<double[]>();
 
-            ProjectSpecification project = FilesManager.ParseProjectData(@"C:\Users\Szab\Desktop\MSRCPSP\def_small\15_3_5_3.def");
+            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\Datasets\200_40_130_9_D4.def";
+            ProjectSpecification project = FilesManager.ParseProjectData(filePath);
             MSRCPSPSolver solver = new MSRCPSPSolver(project, 1000)
             {
-                MutationProbability = 0.2,
+                MutationProbability = 0.1,
                 CrossoverProbability = 0.7,
-                NumberOfGroups = 5,
+                NumberOfGroups = 6,
                 PopulationSize = 30
             };
 
             solver.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)
             {
+                double worst = population.Min(x => x.RateQuality());
+                double average = population.Average(x => x.RateQuality());
+                double best = population.Max(x => x.RateQuality());
                 Console.WriteLine("New generation: {0}", numGeneration + 1);
-                worst.Add(population.Min(x => x.RateQuality()));
-                average.Add(population.Average(x => x.RateQuality()));
-                best.Add(population.Max(x => x.RateQuality()));
+                partialQualities.Add(new double[] { worst, average, best });
             };
 
             ScheduleSpecimen bestSpecimen = solver.Solve();
             Schedule schedule = ScheduleBuilder.BuildScheduleFromSpecimen(project, bestSpecimen);
-            string result = FilesManager.SaveToFile(schedule);
-
-            StringBuilder statisticsBuilder = new StringBuilder();
-
-            for(int i = 0; i < best.Count; i++)
-            {
-                string worstResult = worst[i].ToString(CultureInfo.CurrentUICulture);
-                string averageResult = average[i].ToString(CultureInfo.CurrentUICulture);
-                string bestResult = best[i].ToString(CultureInfo.CurrentUICulture);
-
-                string partialResult = String.Format("{0};{1};{2}", worstResult, averageResult, bestResult);
-                statisticsBuilder.AppendLine(partialResult);
-            }
-
-            string statisticsResult = statisticsBuilder.ToString();
+            FilesManager.SaveResults(filePath, project, solver, schedule, partialQualities);
 
 
             Console.WriteLine();

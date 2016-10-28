@@ -6,6 +6,8 @@ using System.IO;
 using Szab.Scheduling.Representation;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using Szab.EvolutionaryAlgorithm.Base;
+using Szab.Scheduling.MSRCPSP;
 
 namespace Szab.Scheduling.Tools
 {
@@ -14,7 +16,7 @@ namespace Szab.Scheduling.Tools
         private const int TASK_DEF_RELEVANT_COLUMNS = 4;
         private const int RES_DEF_RELEVANT_COLUMNS = 2;
 
-        private static string readFile(string path)
+        private static string ReadFile(string path)
         {
             string fileContents = "";
 
@@ -24,6 +26,14 @@ namespace Szab.Scheduling.Tools
             }
 
             return fileContents;   
+        }
+
+        private static void SaveToFile(string path, string data)
+        {
+            using (StreamWriter stream = new StreamWriter(new FileStream(path, FileMode.CreateNew)))
+            {
+                stream.Write(data);
+            }
         }
 
         private static void assignAvailableResources(ProjectSpecification project)
@@ -36,7 +46,7 @@ namespace Szab.Scheduling.Tools
             }
         }
 
-        private static Resource getResourceFromArray(string[] resourceData)
+        private static Resource GetResourceFromArray(string[] resourceData)
         {
             string name = resourceData[0];
             float salary = float.Parse(resourceData[1], CultureInfo.InvariantCulture);
@@ -54,7 +64,7 @@ namespace Szab.Scheduling.Tools
             return resource;
         }
 
-        private static void parseResources(string resourcesString, ProjectSpecification specification)
+        private static void ParseResources(string resourcesString, ProjectSpecification specification)
         {
             string[] resourcesData = resourcesString.Split('\n');
 
@@ -64,7 +74,7 @@ namespace Szab.Scheduling.Tools
 
                 if (resourceData.Length >= RES_DEF_RELEVANT_COLUMNS)
                 { 
-                    Resource resource = FilesManager.getResourceFromArray(resourceData);
+                    Resource resource = FilesManager.GetResourceFromArray(resourceData);
                     specification.Resources.Add(resource);
                 }
             }
@@ -87,7 +97,7 @@ namespace Szab.Scheduling.Tools
             }
         }
 
-        private static Task getTaskFromArray(string[] taskData)
+        private static Task GetTaskFromArray(string[] taskData)
         {
             string name = taskData[0];
             int duration = int.Parse(taskData[1]);
@@ -100,7 +110,7 @@ namespace Szab.Scheduling.Tools
             return task;
         }
 
-        private static void parseTasks(string tasksString, ProjectSpecification specification)
+        private static void ParseTasks(string tasksString, ProjectSpecification specification)
         {
             string[] tasksData = tasksString.Split('\n');
 
@@ -110,7 +120,7 @@ namespace Szab.Scheduling.Tools
 
                 if (taskData.Length >= TASK_DEF_RELEVANT_COLUMNS)
                 {
-                    Task task = FilesManager.getTaskFromArray(taskData);
+                    Task task = FilesManager.GetTaskFromArray(taskData);
                     specification.Tasks.Add(task);
                 }
             }
@@ -128,7 +138,7 @@ namespace Szab.Scheduling.Tools
 
         public static ProjectSpecification ParseProjectData(string path)
         {
-            string fileContent = FilesManager.readFile(path);
+            string fileContent = FilesManager.ReadFile(path);
             string[] sections = Regex.Split(fileContent, "=+.+\n");
             int numSections = sections.Length;
 
@@ -136,15 +146,15 @@ namespace Szab.Scheduling.Tools
             string resourcesSection = String.IsNullOrEmpty(sections[numSections - 1]) ? sections[numSections - 3] : sections[numSections - 2];
 
             ProjectSpecification projectSpecification = new ProjectSpecification();
-            FilesManager.parseResources(resourcesSection, projectSpecification);
-            FilesManager.parseTasks(tasksSection, projectSpecification);
+            FilesManager.ParseResources(resourcesSection, projectSpecification);
+            FilesManager.ParseTasks(tasksSection, projectSpecification);
 
             FilesManager.assignAvailableResources(projectSpecification);
 
             return projectSpecification;
         }
 
-        public static string SaveToFile(Schedule schedule)
+        public static string SerializeSchedule(Schedule schedule)
         {
             string header = "Hour 	 Resource assignments (resource ID - task ID) ";
             StringBuilder builder = new StringBuilder();
@@ -162,6 +172,60 @@ namespace Szab.Scheduling.Tools
             }
 
             return builder.ToString();
+        }
+
+        private static string SerializeResultQualities(List<double[]> qualities)
+        {
+            StringBuilder statisticsBuilder = new StringBuilder();
+
+            statisticsBuilder.AppendLine("Generation;Worst;Average;Best");
+
+            for (int i = 0; i < qualities.Count; i++)
+            {
+                string worstResult = qualities[i][0].ToString(CultureInfo.CurrentUICulture);
+                string averageResult = qualities[i][1].ToString(CultureInfo.CurrentUICulture);
+                string bestResult = qualities[i][2].ToString(CultureInfo.CurrentUICulture);
+
+                string partialResult = String.Format("{0};{1};{2};{3}", i + 1, worstResult, averageResult, bestResult);
+                statisticsBuilder.AppendLine(partialResult);
+            }
+
+            return statisticsBuilder.ToString();
+        }
+
+        private static string createRunSummary(string filePath, MSRCPSPSolver solver, Schedule result)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.AppendLine("File: " + filePath);
+            builder.AppendLine("Number of generations: " + solver.MaxGenerations);
+            builder.AppendLine("Population size: " + solver.PopulationSize);
+            builder.AppendLine("Number of tournament groups: " + solver.NumberOfGroups);
+            builder.AppendLine("Crossover probability: " + solver.CrossoverProbability);
+            builder.AppendLine("Mutation probability: " + solver.MutationProbability);
+            builder.AppendLine();
+            builder.AppendLine("Result duration: " + result.Length);
+            builder.AppendLine("Result cost: " + result.SummaryCost);
+            builder.AppendLine("========================================");
+            builder.Append(FilesManager.SerializeSchedule(result));
+
+            return builder.ToString();
+        }
+
+        public static void SaveResults(string path, ProjectSpecification project, MSRCPSPSolver solver, Schedule result, List<double[]> functionChange)
+        {
+            string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
+            string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
+            string baseFileName = Path.GetFileName(path);
+
+            Directory.CreateDirectory(workingPath);
+            string serializedResult = FilesManager.SerializeSchedule(result);
+            string qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+            string runSummary = FilesManager.createRunSummary(path, solver, result);
+
+            FilesManager.SaveToFile(workingPath + "/" + baseFileName + ".sol", serializedResult);
+            FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+            FilesManager.SaveToFile(workingPath + "/RunSummary.txt", runSummary);
         }
     }
 }

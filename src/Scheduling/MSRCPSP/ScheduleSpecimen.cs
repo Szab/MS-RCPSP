@@ -29,7 +29,8 @@ namespace Szab.Scheduling.MSRCPSP
             int length = schedule.Length;
             double cost = schedule.SummaryCost;
 
-            return 1/(0.9 * (length/ProjectData.MaxDuration) + 0.1 * (cost/ProjectData.MaxCost));
+            return 1.0 / length;
+            //return 1/(0.3 * (length/ProjectData.MaxDuration) + 0.7 * (cost/ProjectData.MaxCost));
         }
 
         public ScheduleSpecimen CrossOver(ScheduleSpecimen otherSpeciman)

@@ -32,7 +32,7 @@ namespace Szab.Scheduling.MSRCPSP
 
             Resource resource = null;
             List<Resource> availableResources = task.AvailableResources;
-            IEnumerable<TaskAssignment> relevantAssignments = schedule.GetTasksForResources(availableResources).OrderBy(x => x.StartOffset);
+            //IEnumerable<TaskAssignment> relevantAssignments = schedule.GetTasksForResources(availableResources).OrderBy(x => x.StartOffset);
 
             while(resource == null)
             {
