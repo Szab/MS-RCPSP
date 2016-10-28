@@ -9,27 +9,9 @@ namespace Szab.Scheduling.MSRCPSP
 {
     public static class ScheduleBuilder
     {
-        private static Resource GetAvailableResourceForTask(ProjectSpecification projectData, Schedule schedule, int offset, Task task)
-        {
-            List<Resource> availableResources = task.AvailableResources.ToList();
-            availableResources.Shuffle();
-
-            foreach (Resource resource in availableResources)
-            {
-                bool isFree = schedule.IsResourceAvailableAt(resource, offset, offset + task.Length);
-
-                if (isFree)
-                {
-                    return resource;
-                }
-            }
-
-            return null;
-        } 
-
         private static int ScheduleTask(ProjectSpecification projectData, Task task, Schedule schedule)
         {
-            int offset = 0;
+            int offset = 1;
             TaskAssignment existingAssignment = schedule.GetAssignmentByTask(task);
 
             if (existingAssignment != null)
@@ -49,11 +31,32 @@ namespace Szab.Scheduling.MSRCPSP
             }
 
             Resource resource = null;
-            offset--;
+            List<Resource> availableResources = task.AvailableResources;
+            IEnumerable<TaskAssignment> relevantAssignments = schedule.GetTasksForResources(availableResources).OrderBy(x => x.StartOffset);
+
             while(resource == null)
             {
-                offset++;
-                resource = ScheduleBuilder.GetAvailableResourceForTask(projectData, schedule, offset, task);
+                TaskAssignment earliestEndingCollision = null;
+
+                foreach(Resource availableResource in availableResources)
+                {
+                    TaskAssignment collidingAssignment = schedule.GetCollidingAssignment(availableResource, offset, offset + task.Length);
+
+                    if (collidingAssignment == null)
+                    {
+                        resource = availableResource;
+                        break;
+                    }
+                    else if (earliestEndingCollision == null || collidingAssignment.StartOffset < earliestEndingCollision.StartOffset)
+                    {
+                        earliestEndingCollision = collidingAssignment;
+                    }
+                }
+
+                if (resource == null)
+                {
+                    offset = earliestEndingCollision.EndOffset + 1;
+                }
             }
 
             TaskAssignment taskAssignment = new TaskAssignment(task, resource, offset);
