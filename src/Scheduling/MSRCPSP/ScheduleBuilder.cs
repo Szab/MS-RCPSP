@@ -9,7 +9,7 @@ namespace Szab.Scheduling.MSRCPSP
 {
     public static class ScheduleBuilder
     {
-        private static int ScheduleTask(ProjectSpecification projectData, Task task, Schedule schedule)
+        private static int ScheduleTask(ProjectSpecification projectData, ScheduleSpecimen specimen, Task task, Schedule schedule)
         {
             int offset = 1;
             TaskAssignment existingAssignment = schedule.GetAssignmentByTask(task);
@@ -21,10 +21,12 @@ namespace Szab.Scheduling.MSRCPSP
 
             if (task.Predecessors.Count > 0)
             {
-                for (int i = 0; i < task.Predecessors.Count; i++)
+                List<Task> predecessors = task.Predecessors.OrderBy(x => Array.IndexOf(specimen.Tasks, x)).ToList();
+
+                for (int i = 0; i < predecessors.Count; i++)
                 {
-                    Task predecessor = task.Predecessors[i];
-                    int newOffset = ScheduleBuilder.ScheduleTask(projectData, predecessor, schedule);
+                    Task predecessor = predecessors[i];
+                    int newOffset = ScheduleBuilder.ScheduleTask(projectData, specimen, predecessor, schedule);
 
                     offset = offset > newOffset ? offset : newOffset;
                 }
@@ -32,7 +34,6 @@ namespace Szab.Scheduling.MSRCPSP
 
             Resource resource = null;
             List<Resource> availableResources = task.AvailableResources;
-            //IEnumerable<TaskAssignment> relevantAssignments = schedule.GetTasksForResources(availableResources).OrderBy(x => x.StartOffset);
 
             while(resource == null)
             {
@@ -47,7 +48,7 @@ namespace Szab.Scheduling.MSRCPSP
                         resource = availableResource;
                         break;
                     }
-                    else if (earliestEndingCollision == null || collidingAssignment.StartOffset < earliestEndingCollision.StartOffset)
+                    else if (earliestEndingCollision == null || collidingAssignment.EndOffset < earliestEndingCollision.EndOffset)
                     {
                         earliestEndingCollision = collidingAssignment;
                     }
@@ -72,7 +73,7 @@ namespace Szab.Scheduling.MSRCPSP
             for(int i = 0; i < specimen.Tasks.Length; i++)
             {
                 Task currentTask = specimen.Tasks[i];
-                ScheduleBuilder.ScheduleTask(projectData, currentTask, schedule);
+                ScheduleBuilder.ScheduleTask(projectData, specimen, currentTask, schedule);
             }
 
             return schedule;

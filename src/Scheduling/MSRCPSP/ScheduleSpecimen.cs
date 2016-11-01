@@ -30,37 +30,33 @@ namespace Szab.Scheduling.MSRCPSP
             double cost = schedule.SummaryCost;
 
             return 1.0 / length;
-            //return 1/(0.3 * (length/ProjectData.MaxDuration) + 0.7 * (cost/ProjectData.MaxCost));
         }
 
+        // Crossover operator: copy a sequence from parent to child and copy remaining tasks from other parent in their original order.
         public ScheduleSpecimen CrossOver(ScheduleSpecimen otherSpeciman)
         {
             ScheduleSpecimen child = new ScheduleSpecimen(this.ProjectData, this.Tasks.Length);
 
-            int numTasks = this.Tasks.Length;
-            int skip = random.Next(this.Tasks.Length);
-            int take = random.Next(this.Tasks.Length / 2);
-            int newPosition = random.Next(this.Tasks.Length);
+            int maxElementsToCopy = this.Tasks.Length / 2;
+            int endPosition = random.Next(this.Tasks.Length);
+            int startPosition = random.Next(Math.Max(0, endPosition - maxElementsToCopy + 1), endPosition);
 
-            Task[] tasksToCopy = this.Tasks.Skip(skip).Take(take).ToArray();
+            Task[] tasksToCopy = this.Tasks.Skip(startPosition).Take(endPosition - startPosition + 1).ToArray();
+            tasksToCopy.CopyTo(child.Tasks, startPosition);
 
-            for (int i = 0, currentPosition = newPosition; i < tasksToCopy.Length; i++)
+            for(int i = 0; i < otherSpeciman.Tasks.Length; i++)
             {
-                child.Tasks[newPosition] = tasksToCopy[i];
-                newPosition = (newPosition + 1) % numTasks;
-            }
+                Task currentTask = otherSpeciman.Tasks[i];
 
-            for (int i = 0; i < child.Tasks.Length; i++)
-            {
-                if (child.Tasks[i] == null)
+                if (!tasksToCopy.Contains(currentTask))
                 {
                     for (int j = 0; j < otherSpeciman.Tasks.Length; j++)
                     {
-                        Task currentTask = otherSpeciman.Tasks[j];
+                        int newIndex = (i + j) % otherSpeciman.Tasks.Length;
 
-                        if (!child.Tasks.Contains(currentTask))
+                        if(child.Tasks[newIndex] == null)
                         {
-                            child.Tasks[i] = currentTask;
+                            child.Tasks[newIndex] = currentTask;
                             break;
                         }
                     }
@@ -70,19 +66,19 @@ namespace Szab.Scheduling.MSRCPSP
             return child;
         }
 
-        // Mutation operator: swapping random pairs
+        // Mutation operator: inversion of a random sequence
         public void Mutate()
         {
-            int pairs = random.Next(this.Tasks.Length);
+            int startIndex = random.Next(this.Tasks.Length - 1);
+            int endIndex = random.Next(startIndex + 1, this.Tasks.Length);
 
-            for(int i = 0; i < pairs; i++)
+            for(int i = startIndex, j = endIndex - 1; i <= j; i++, j--)
             {
-                int firstIndex = random.Next(this.Tasks.Length);
-                int secondIndex = random.Next(this.Tasks.Length);
+                Task first = this.Tasks[i];
+                Task second = this.Tasks[j];
 
-                Task temp = this.Tasks[secondIndex];
-                this.Tasks[secondIndex] = this.Tasks[firstIndex];
-                this.Tasks[firstIndex] = temp;
+                this.Tasks[i] = second;
+                this.Tasks[j] = first;
             }
         }
 

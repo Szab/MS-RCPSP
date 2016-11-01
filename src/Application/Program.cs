@@ -16,14 +16,14 @@ namespace Application
         {
             List<double[]> partialQualities = new List<double[]>();
 
-            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\Datasets\200_40_130_9_D4.def";
+            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\dataset_def\100_5_64_15.def";
             ProjectSpecification project = FilesManager.ParseProjectData(filePath);
-            MSRCPSPSolver solver = new MSRCPSPSolver(project, 1000)
+            MSRCPSPSolver solver = new MSRCPSPSolver(project, 100)
             {
-                MutationProbability = 0.1,
-                CrossoverProbability = 0.7,
-                NumberOfGroups = 6,
-                PopulationSize = 30
+                MutationProbability = 0.15,
+                CrossoverProbability = 0.60,
+                PercentInGroup = 0.05,
+                PopulationSize = 70
             };
 
             solver.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)
@@ -31,7 +31,7 @@ namespace Application
                 double worst = population.Min(x => x.RateQuality());
                 double average = population.Average(x => x.RateQuality());
                 double best = population.Max(x => x.RateQuality());
-                Console.WriteLine("New generation: {0}", numGeneration + 1);
+                Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1/best, 1/average, 1/worst);
                 partialQualities.Add(new double[] { worst, average, best });
             };
 

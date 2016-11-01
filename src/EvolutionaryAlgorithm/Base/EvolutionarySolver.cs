@@ -34,40 +34,82 @@ namespace Szab.EvolutionaryAlgorithm.Base
         }
 
         public abstract bool CheckIfFinished(int numGeneration, IEnumerable<T> population);
-        public abstract IEnumerable<T> SelectNewPopulation(IEnumerable<T> population);
+        public abstract IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities);
         public abstract IEnumerable<T> CreateInitialPopulation();
         
         protected void CrossOverPopulation(List<T> population, Random randomGenerator)
-        {          
-            for (int i = 0; i < population.Count - 1; i = i + 2)
+        {
+            Object addingLock = new Object();
+            List<T> children = new List<T>();
+
+            Parallel.For(0, population.Count - 1, index =>
             {
-                double rand = randomGenerator.NextDouble();
-
-                if (rand < this.CrossoverProbability)
+                if (index % 2 == 0)
                 {
-                    T firstParent = population[i];
-                    T secondParent = population[i + 1];
+                    double rand = randomGenerator.NextDouble();
 
-                    population.Add(firstParent.CrossOver(secondParent));
-                    population.Add(secondParent.CrossOver(firstParent));
+                    if (rand < this.CrossoverProbability)
+                    {
+                        T firstParent = population[index];
+                        T secondParent = population[index + 1];
+
+                        lock (addingLock)
+                        {
+                            children.Add(firstParent.CrossOver(secondParent));
+                            children.Add(secondParent.CrossOver(firstParent));
+                        }
+                    }
                 }
-            }
+            });
+
+            population.AddRange(children);
         }
 
         protected void MutatePopulation(List<T> population, Random randomGenerator)
         {
-            for (int i = 0; i < population.Count; i++)
+            Parallel.ForEach(population, specimen =>
             {
                 double rand = randomGenerator.NextDouble();
 
                 if (rand < this.MutationProbability)
                 {
-                    population[i].Mutate();
+                    specimen.Mutate();
                 }
-            }
+            });
         }
 
-        public T Solve()
+        protected IEnumerable<Tuple<T, double>> CalculateQualities(List<T> population)
+        {
+            Object addingLock = new Object();
+            List<Tuple<T, double>> qualities = new List<Tuple<T, double>>();
+
+            Parallel.ForEach(population, (item) =>
+            {
+                double quality = item.RateQuality();
+                Tuple<T, double> qualityItem = new Tuple<T, double>(item, quality);
+
+                lock (addingLock)
+                {
+                    qualities.Add(qualityItem);
+                }
+            });
+
+            return qualities;
+        }
+
+        protected virtual void PerformStep(List<T> population, Random random)
+        {
+            this.MutatePopulation(population, random);
+            this.CrossOverPopulation(population, random);
+
+            int populationSize = population.Count;
+            IEnumerable<Tuple<T, double>> qualities = this.CalculateQualities(population);
+            IEnumerable<T> newPopulation = this.SelectNewPopulation(qualities).Take(this.PopulationSize);
+            population.Clear();
+            population.AddRange(newPopulation);
+        }
+
+        public virtual T Solve()
         {
             int numGeneration = 0;
             List<T> population = this.CreateInitialPopulation().ToList();
@@ -80,13 +122,8 @@ namespace Szab.EvolutionaryAlgorithm.Base
                     this.OnNextGeneration(numGeneration, population);
                 }
 
-                this.MutatePopulation(population, random);
-                this.CrossOverPopulation(population, random);
+                this.PerformStep(population, random);
 
-                int populationSize = population.Count;
-                IEnumerable<T> newPopulation = this.SelectNewPopulation(population).Take(this.PopulationSize);
-                population.Clear();
-                population.AddRange(newPopulation);
                 numGeneration++;
             }
 

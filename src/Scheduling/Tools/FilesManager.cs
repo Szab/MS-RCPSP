@@ -200,7 +200,7 @@ namespace Szab.Scheduling.Tools
             builder.AppendLine("File: " + filePath);
             builder.AppendLine("Number of generations: " + solver.MaxGenerations);
             builder.AppendLine("Population size: " + solver.PopulationSize);
-            builder.AppendLine("Number of tournament groups: " + solver.NumberOfGroups);
+            builder.AppendLine("Percent of population in a tournament group: " + solver.PercentInGroup);
             builder.AppendLine("Crossover probability: " + solver.CrossoverProbability);
             builder.AppendLine("Mutation probability: " + solver.MutationProbability);
             builder.AppendLine();
