@@ -16,14 +16,14 @@ namespace Application
         {
             List<double[]> partialQualities = new List<double[]>();
 
-            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\dataset_def\100_5_64_15.def";
+            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\dataset_def\100_5_22_15.def";
             ProjectSpecification project = FilesManager.ParseProjectData(filePath);
-            MSRCPSPSolver solver = new MSRCPSPSolver(project, 100)
+            MSRCPSPSolver solver = new MSRCPSPSolver(project, 10)
             {
-                MutationProbability = 0.15,
-                CrossoverProbability = 0.60,
+                MutationProbability = 0.10,
+                CrossoverProbability = 0.65,
                 PercentInGroup = 0.05,
-                PopulationSize = 70
+                PopulationSize = 50
             };
 
             solver.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)

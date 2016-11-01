@@ -91,7 +91,7 @@ namespace Szab.Scheduling.Representation
 
         public TaskAssignment GetAssignmentByTask(Task task)
         {
-            return this.tasks.Where(x => x.Task == task).FirstOrDefault();
+            return this.tasks.FirstOrDefault(x => x.Task == task);
         }
 
         public IEnumerable<TaskAssignment> GetAllAssignments()
@@ -109,10 +109,10 @@ namespace Szab.Scheduling.Representation
 
         public TaskAssignment GetCollidingAssignment(Resource resource, int time, int to)
         {
-            return this.tasks.Where(x => x.Resource == resource && (time <= x.StartOffset && to >= x.StartOffset||
-                                                                    time <= x.EndOffset && to >= x.EndOffset    ||
-                                                                    time >= x.StartOffset && to <= x.EndOffset  ||
-                                                                    time <= x.StartOffset && to >= x.EndOffset)).FirstOrDefault();
+            return this.tasks.FirstOrDefault(x => x.Resource == resource && (time <= x.StartOffset && to >= x.StartOffset ||
+                                                                    time <= x.EndOffset && to >= x.EndOffset ||
+                                                                    time >= x.StartOffset && to <= x.EndOffset ||
+                                                                    time <= x.StartOffset && to >= x.EndOffset));
         }
 
         public IEnumerable<TaskAssignment> GetTasksForResource(Resource resource)

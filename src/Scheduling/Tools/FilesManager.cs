@@ -83,7 +83,7 @@ namespace Szab.Scheduling.Tools
         private static void fillPredecessors(string[] taskData, ProjectSpecification specification)
         {
             string taskName = taskData[0];
-            Task task = specification.Tasks.Where(x => x.Name == taskName).FirstOrDefault();
+            Task task = specification.Tasks.FirstOrDefault(x => x.Name == taskName);
 
             for(var i = 4; i < taskData.Length; i++)
             {
@@ -91,7 +91,7 @@ namespace Szab.Scheduling.Tools
 
                 if (!String.IsNullOrEmpty(predecessorId))
                 {
-                    Task predecessor = specification.Tasks.Where(x => x.Name == predecessorId).FirstOrDefault();
+                    Task predecessor = specification.Tasks.FirstOrDefault(x => x.Name == predecessorId);
                     task.Predecessors.Add(predecessor);
                 }
             }
