@@ -1,4 +1,4 @@
-﻿using Szab.EvolutionaryAlgorithm.Base;
+﻿using Szab.EvolutionaryAlgorithm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
 {
     public abstract class TopBestEvolutionarySolver<T> : EvolutionarySolver<T> where T : class, ISpecimen<T>
     {
-        public override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities)
+        protected override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities)
         {
             return qualities.OrderByDescending(x => x.Item2).Take(this.PopulationSize).Select(x => x.Item1);
         }

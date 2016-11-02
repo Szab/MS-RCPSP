@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MSRCPSP\MSRCPSPSolver.cs" />
+    <Compile Include="MSRCPSP\MSRCPSPTabuSolver.cs" />
     <Compile Include="MSRCPSP\ScheduleBuilder.cs" />
     <Compile Include="MSRCPSP\ScheduleSpecimen.cs" />
     <Compile Include="Representation\ProjectSpecification.cs" />
@@ -54,9 +55,9 @@
     <Compile Include="Tools\ListExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EvolutionaryAlgorithm\EvolutionaryAlgorithm.csproj">
+    <ProjectReference Include="..\EvolutionaryAlgorithm\Metaheuristics.csproj">
       <Project>{bc020b28-b2b1-4270-803d-a9e694a7f01a}</Project>
-      <Name>EvolutionaryAlgorithm</Name>
+      <Name>Metaheuristics</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

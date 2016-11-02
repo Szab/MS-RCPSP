@@ -50,9 +50,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EvolutionaryAlgorithm\EvolutionaryAlgorithm.csproj">
+    <ProjectReference Include="..\EvolutionaryAlgorithm\Metaheuristics.csproj">
       <Project>{bc020b28-b2b1-4270-803d-a9e694a7f01a}</Project>
-      <Name>EvolutionaryAlgorithm</Name>
+      <Name>Metaheuristics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Scheduling\Scheduling.csproj">
       <Project>{d75e1d03-6360-4c8d-9b27-947bb0548a36}</Project>

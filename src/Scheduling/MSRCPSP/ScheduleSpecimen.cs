@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Szab.Scheduling.Representation;
-using Szab.EvolutionaryAlgorithm.Base;
+using Szab.EvolutionaryAlgorithm;
+using Szab.TabuSearch;
 
 namespace Szab.Scheduling.MSRCPSP
 {
-    public class ScheduleSpecimen : ISpecimen<ScheduleSpecimen>
+    public class ScheduleSpecimen : ISpecimen<ScheduleSpecimen>, ITabuSolution<ScheduleSpecimen>
     {
         private static Random random = new Random(Guid.NewGuid().GetHashCode());
 
@@ -82,16 +83,47 @@ namespace Szab.Scheduling.MSRCPSP
             }
         }
 
+        public bool CheckEquality(ScheduleSpecimen other)
+        {
+            for(int i = 0; i < this.Tasks.Length; i++)
+            {
+                if(this.Tasks[i] != other.Tasks[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public IEnumerable<ScheduleSpecimen> GetNeighbours()
+        {
+            int index = random.Next(this.Tasks.Length);
+            List<ScheduleSpecimen> neighbours = new List<ScheduleSpecimen>();
+
+            for(int i = 0; i < this.Tasks.Length; i++)
+            {
+                ScheduleSpecimen neighbour = new ScheduleSpecimen(this);
+                neighbour.ProjectData = this.ProjectData;
+                Task temp = neighbour.Tasks[index];
+                neighbour.Tasks[index] = neighbour.Tasks[i];
+                neighbour.Tasks[i] = temp;
+                neighbours.Add(neighbour);
+            }
+
+            return neighbours;
+        }
+
         public ScheduleSpecimen(ProjectSpecification projectData, int size)
         {
             this.ProjectData = projectData;
             this.Tasks = new Task[size];
         }
 
-        public ScheduleSpecimen(ScheduleSpecimen otherSpecimen)
+        public ScheduleSpecimen(ScheduleSpecimen otherSpecimen) : this(otherSpecimen.ProjectData, otherSpecimen.Tasks.Count())
         {
             this.Tasks = new Task[otherSpecimen.Tasks.Length];
-            this.Tasks.CopyTo(this.Tasks, 0);
+            otherSpecimen.Tasks.CopyTo(this.Tasks, 0);
         }
     }
 }

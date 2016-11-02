@@ -22,17 +22,17 @@ namespace Szab.Scheduling.MSRCPSP
             set;
         }
 
-        public override bool CheckIfFinished(int numGeneration, IEnumerable<ScheduleSpecimen> population)
+        protected override bool CheckIfFinished(int numGeneration, IEnumerable<ScheduleSpecimen> population)
         {
             return numGeneration >= this.MaxGenerations;
         }
 
-        public override IEnumerable<ScheduleSpecimen> CreateInitialPopulation()
+        protected override IEnumerable<ScheduleSpecimen> CreateInitialPopulation()
         {
             List<Task> availableTasks = this.ProjectData.Tasks.ToList();
             List<ScheduleSpecimen> initialPopulation = new List<ScheduleSpecimen>();
 
-            for(int i = 0; i < this.PopulationSize; i++)
+            for(int i = 0; i < this.PopulationSize * 3; i++)
             {
                 ScheduleSpecimen newSpecimen = new ScheduleSpecimen(this.ProjectData, availableTasks.Count);
                 availableTasks.Shuffle();

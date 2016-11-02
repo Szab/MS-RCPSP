@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Szab.MetaheuristicsBase;
 
-namespace Szab.EvolutionaryAlgorithm.Base
+namespace Szab.EvolutionaryAlgorithm
 {
-    public interface ISpecimen<T> where T : class
+    public interface ISpecimen<T> : ISolution<T> where T : class, ISpecimen<T>
     {
-        double RateQuality();
         T CrossOver(T otherSpeciman);
         void Mutate();
     }

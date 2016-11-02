@@ -6,8 +6,9 @@ using System.IO;
 using Szab.Scheduling.Representation;
 using System.Text.RegularExpressions;
 using System.Globalization;
-using Szab.EvolutionaryAlgorithm.Base;
+using Szab.EvolutionaryAlgorithm;
 using Szab.Scheduling.MSRCPSP;
+using Szab.TabuSearch;
 
 namespace Szab.Scheduling.Tools
 {
@@ -36,7 +37,7 @@ namespace Szab.Scheduling.Tools
             }
         }
 
-        private static void assignAvailableResources(ProjectSpecification project)
+        private static void AssignAvailableResources(ProjectSpecification project)
         {
             foreach(Task task in project.Tasks)
             {
@@ -80,7 +81,7 @@ namespace Szab.Scheduling.Tools
             }
         }
 
-        private static void fillPredecessors(string[] taskData, ProjectSpecification specification)
+        private static void FillPredecessors(string[] taskData, ProjectSpecification specification)
         {
             string taskName = taskData[0];
             Task task = specification.Tasks.FirstOrDefault(x => x.Name == taskName);
@@ -131,7 +132,7 @@ namespace Szab.Scheduling.Tools
 
                 if (taskData.Length >= TASK_DEF_RELEVANT_COLUMNS)
                 {
-                    FilesManager.fillPredecessors(taskData, specification);
+                    FilesManager.FillPredecessors(taskData, specification);
                 }
             }
         }
@@ -149,7 +150,7 @@ namespace Szab.Scheduling.Tools
             FilesManager.ParseResources(resourcesSection, projectSpecification);
             FilesManager.ParseTasks(tasksSection, projectSpecification);
 
-            FilesManager.assignAvailableResources(projectSpecification);
+            FilesManager.AssignAvailableResources(projectSpecification);
 
             return projectSpecification;
         }
@@ -193,16 +194,34 @@ namespace Szab.Scheduling.Tools
             return statisticsBuilder.ToString();
         }
 
-        private static string createRunSummary(string filePath, MSRCPSPSolver solver, Schedule result)
+        private static string CreateRunSummary(string filePath, MSRCPSPSolver solver, Schedule result)
         {
             StringBuilder builder = new StringBuilder();
 
             builder.AppendLine("File: " + filePath);
+            builder.AppendLine("Metaheuristic: Evolutionary algorithm");
             builder.AppendLine("Number of generations: " + solver.MaxGenerations);
             builder.AppendLine("Population size: " + solver.PopulationSize);
             builder.AppendLine("Percent of population in a tournament group: " + solver.PercentInGroup);
             builder.AppendLine("Crossover probability: " + solver.CrossoverProbability);
             builder.AppendLine("Mutation probability: " + solver.MutationProbability);
+            builder.AppendLine();
+            builder.AppendLine("Result duration: " + result.Length);
+            builder.AppendLine("Result cost: " + result.SummaryCost);
+            builder.AppendLine("========================================");
+            builder.Append(FilesManager.SerializeSchedule(result));
+
+            return builder.ToString();
+        }
+
+        private static string CreateRunSummary(string filePath, TabuSolver<ScheduleSpecimen> solver, Schedule result)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.AppendLine("File: " + filePath);
+            builder.AppendLine("Metaheuristic: Tabu Search");
+            builder.AppendLine("Number of steps: " + solver.NumberOfSteps);
+            builder.AppendLine("Tabu size: " + solver.TabuSize);
             builder.AppendLine();
             builder.AppendLine("Result duration: " + result.Length);
             builder.AppendLine("Result cost: " + result.SummaryCost);
@@ -221,7 +240,23 @@ namespace Szab.Scheduling.Tools
             Directory.CreateDirectory(workingPath);
             string serializedResult = FilesManager.SerializeSchedule(result);
             string qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
-            string runSummary = FilesManager.createRunSummary(path, solver, result);
+            string runSummary = FilesManager.CreateRunSummary(path, solver, result);
+
+            FilesManager.SaveToFile(workingPath + "/" + baseFileName + ".sol", serializedResult);
+            FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+            FilesManager.SaveToFile(workingPath + "/RunSummary.txt", runSummary);
+        }
+
+        public static void SaveResults(string path, ProjectSpecification project, TabuSolver<ScheduleSpecimen> solver, Schedule result, List<double[]> functionChange)
+        {
+            string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
+            string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
+            string baseFileName = Path.GetFileName(path);
+
+            Directory.CreateDirectory(workingPath);
+            string serializedResult = FilesManager.SerializeSchedule(result);
+            string qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+            string runSummary = FilesManager.CreateRunSummary(path, solver, result);
 
             FilesManager.SaveToFile(workingPath + "/" + baseFileName + ".sol", serializedResult);
             FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);

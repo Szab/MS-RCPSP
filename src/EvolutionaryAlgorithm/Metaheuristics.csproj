@@ -7,8 +7,8 @@
     <ProjectGuid>{BC020B28-B2B1-4270-803D-A9E694A7F01A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EvolutionaryAlgorithm</RootNamespace>
-    <AssemblyName>EvolutionaryAlgorithm</AssemblyName>
+    <RootNamespace>Szab</RootNamespace>
+    <AssemblyName>Szab.Metaheuristics</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,11 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base\EvolutionarySolver.cs" />
-    <Compile Include="Base\ISpecimen.cs" />
+    <Compile Include="EvolutionaryAlgorithm\EvolutionarySolver.cs" />
+    <Compile Include="Base\ISolution.cs" />
+    <Compile Include="TabuSearch\ITabuSolution.cs" />
+    <Compile Include="Base\ISolver.cs" />
+    <Compile Include="EvolutionaryAlgorithm\ISpecimen.cs" />
+    <Compile Include="TabuSearch\TabuSolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SelectionSpecific\TopBestEvolutionarySolver.cs" />
-    <Compile Include="SelectionSpecific\TournamentEvolutionarySolver.cs" />
+    <Compile Include="EvolutionaryAlgorithm\TopBestEvolutionarySolver.cs" />
+    <Compile Include="EvolutionaryAlgorithm\TournamentEvolutionarySolver.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

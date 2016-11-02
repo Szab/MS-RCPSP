@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Szab.EvolutionaryAlgorithm.Base;
+using Szab.EvolutionaryAlgorithm;
 
 namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
 {
@@ -23,7 +23,7 @@ namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
             }
         }
 
-        public override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities)
+        protected override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities)
         {
             List<T> newPopulation = new List<T>();
 

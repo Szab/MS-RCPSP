@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Szab.MetaheuristicsBase;
 
-namespace Szab.EvolutionaryAlgorithm.Base
+namespace Szab.EvolutionaryAlgorithm
 {
-    public abstract class EvolutionarySolver<T> where T : class, ISpecimen<T>
+    public abstract class EvolutionarySolver<T> : ISolver<T> where T : class, ISpecimen<T>
     {
 
         private double mutationProbability;
@@ -33,9 +34,9 @@ namespace Szab.EvolutionaryAlgorithm.Base
             set;
         }
 
-        public abstract bool CheckIfFinished(int numGeneration, IEnumerable<T> population);
-        public abstract IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities);
-        public abstract IEnumerable<T> CreateInitialPopulation();
+        protected abstract bool CheckIfFinished(int numGeneration, IEnumerable<T> population);
+        protected abstract IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities);
+        protected abstract IEnumerable<T> CreateInitialPopulation();
         
         protected void CrossOverPopulation(List<T> population, Random randomGenerator)
         {
@@ -99,14 +100,15 @@ namespace Szab.EvolutionaryAlgorithm.Base
 
         protected virtual void PerformStep(List<T> population, Random random)
         {
-            this.MutatePopulation(population, random);
-            this.CrossOverPopulation(population, random);
-
-            int populationSize = population.Count;
             IEnumerable<Tuple<T, double>> qualities = this.CalculateQualities(population);
             IEnumerable<T> newPopulation = this.SelectNewPopulation(qualities).Take(this.PopulationSize);
             population.Clear();
             population.AddRange(newPopulation);
+
+            this.MutatePopulation(population, random);
+            this.CrossOverPopulation(population, random);
+
+            int populationSize = population.Count;
         }
 
         public virtual T Solve()

@@ -7,6 +7,7 @@ using Szab.Scheduling.Representation;
 using Szab.Scheduling.Tools;
 using Szab.Scheduling.MSRCPSP;
 using System.Globalization;
+using Szab.TabuSearch;
 
 namespace Application
 {
@@ -16,12 +17,19 @@ namespace Application
         {
             List<double[]> partialQualities = new List<double[]>();
 
-            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\dataset_def\100_5_22_15.def";
+            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\100_5_22_15.def";
             ProjectSpecification project = FilesManager.ParseProjectData(filePath);
-            MSRCPSPSolver solver = new MSRCPSPSolver(project, 10)
+
+            //MSRCPSPTabuSolver solver = new MSRCPSPTabuSolver(project)
+            //{
+            //    NumberOfSteps = 1000,
+            //    TabuSize = 100
+            //};
+
+            MSRCPSPSolver solver = new MSRCPSPSolver(project, 300)
             {
-                MutationProbability = 0.10,
-                CrossoverProbability = 0.65,
+                MutationProbability = 0.025,
+                CrossoverProbability = 0.7,
                 PercentInGroup = 0.05,
                 PopulationSize = 50
             };
@@ -31,9 +39,18 @@ namespace Application
                 double worst = population.Min(x => x.RateQuality());
                 double average = population.Average(x => x.RateQuality());
                 double best = population.Max(x => x.RateQuality());
-                Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1/best, 1/average, 1/worst);
+                Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, 1 / average, 1 / worst);
                 partialQualities.Add(new double[] { worst, average, best });
             };
+
+            //solver.OnNextGeneration += delegate (int numGeneration, ScheduleSpecimen current, ScheduleSpecimen bestSolution)
+            //{
+            //    double worst = current.RateQuality();
+            //    double average = double.NaN;
+            //    double best = bestSolution.RateQuality();
+            //    Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, 1 / average, 1 / worst);
+            //    partialQualities.Add(new double[] { worst, average, best });
+            //};
 
             ScheduleSpecimen bestSpecimen = solver.Solve();
             Schedule schedule = ScheduleBuilder.BuildScheduleFromSpecimen(project, bestSpecimen);
