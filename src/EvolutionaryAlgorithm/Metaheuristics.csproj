@@ -49,6 +49,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EvolutionaryAlgorithm\TopBestEvolutionarySolver.cs" />
     <Compile Include="EvolutionaryAlgorithm\TournamentEvolutionarySolver.cs" />
+    <Compile Include="Tools\ListExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

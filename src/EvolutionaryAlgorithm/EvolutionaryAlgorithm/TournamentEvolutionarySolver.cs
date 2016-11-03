@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Szab.EvolutionaryAlgorithm;
+using Szab.Metaheuristics.Tools;
 
 namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
 {
@@ -25,15 +26,17 @@ namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
 
         protected override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities)
         {
+            List<Tuple<T, double>> qualitiesList = qualities.ToList();
             List<Tuple<T, double>> newPopulation = new List<Tuple<T, double>>();
 
-            int step = (int)Math.Ceiling(qualities.Count() * this.PercentInGroup);
-            int groups = (int)Math.Ceiling(qualities.Count() / (double)step);
+            int step = (int)Math.Ceiling(qualitiesList.Count * this.PercentInGroup);
+            int groups = (int)Math.Ceiling(qualitiesList.Count / (double)step);
             int winnersInGroup = (int)Math.Ceiling(this.PopulationSize / (double)groups);
+            qualitiesList.Shuffle();
 
-            for(var i = 0; i < qualities.Count(); i = i + step)
+            for(var i = 0; i < qualitiesList.Count; i = i + step)
             {
-                IEnumerable<Tuple<T, double>> subpopulation = qualities.Skip(i).Take(step).OrderByDescending(x => x.Item2)
+                IEnumerable<Tuple<T, double>> subpopulation = qualitiesList.Skip(i).Take(step).OrderByDescending(x => x.Item2)
                                                 .Take(winnersInGroup);
 
                 newPopulation.AddRange(subpopulation);

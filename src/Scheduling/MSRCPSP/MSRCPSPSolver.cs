@@ -32,7 +32,7 @@ namespace Szab.Scheduling.MSRCPSP
             List<Task> availableTasks = this.ProjectData.Tasks.ToList();
             List<ScheduleSpecimen> initialPopulation = new List<ScheduleSpecimen>();
 
-            for(int i = 0; i < this.PopulationSize * 3; i++)
+            for(int i = 0; i < this.PopulationSize; i++)
             {
                 ScheduleSpecimen newSpecimen = new ScheduleSpecimen(this.ProjectData, availableTasks.Count);
                 availableTasks.Shuffle();

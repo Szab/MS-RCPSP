@@ -5,6 +5,7 @@ using System.Text;
 using Szab.Scheduling.Representation;
 using Szab.EvolutionaryAlgorithm;
 using Szab.TabuSearch;
+using Szab.Scheduling.Tools;
 
 namespace Szab.Scheduling.MSRCPSP
 {
@@ -23,14 +24,23 @@ namespace Szab.Scheduling.MSRCPSP
             get;
         }
 
+        private double? quality = null;
+
         public double RateQuality()
         {
+            if(quality.HasValue)
+            {
+                return quality.Value;
+            }
+
             Schedule schedule = ScheduleBuilder.BuildScheduleFromSpecimen(this.ProjectData, this);
 
             int length = schedule.Length;
             double cost = schedule.SummaryCost;
 
-            return 1.0 / length;
+            quality = 1.0 / length;
+
+            return quality.Value;
         }
 
         // Crossover operator: copy a sequence from parent to child and copy remaining tasks from other parent in their original order.
@@ -38,7 +48,7 @@ namespace Szab.Scheduling.MSRCPSP
         {
             ScheduleSpecimen child = new ScheduleSpecimen(this.ProjectData, this.Tasks.Length);
 
-            int maxElementsToCopy = this.Tasks.Length * 3 / 4;
+            int maxElementsToCopy = (int)(this.Tasks.Length * 0.5);
             int endPosition = random.Next(this.Tasks.Length);
             int startPosition = random.Next(Math.Max(0, endPosition - maxElementsToCopy + 1), endPosition);
 
@@ -67,20 +77,18 @@ namespace Szab.Scheduling.MSRCPSP
             return child;
         }
 
-        // Mutation operator: inversion of a random sequence
+        // Mutation operator: scramble random sequence
         public void Mutate()
         {
+            quality = null;
+
             int startIndex = random.Next(this.Tasks.Length - 1);
             int endIndex = random.Next(startIndex + 1, this.Tasks.Length);
 
-            for(int i = startIndex, j = endIndex - 1; i <= j; i++, j--)
-            {
-                Task first = this.Tasks[i];
-                Task second = this.Tasks[j];
+            Task[] tasks = this.Tasks.Skip(startIndex).Take(endIndex - startIndex).ToArray();
+            tasks.Shuffle();
 
-                this.Tasks[i] = second;
-                this.Tasks[j] = first;
-            }
+            tasks.CopyTo(this.Tasks, startIndex);
         }
 
         public bool CheckEquality(ScheduleSpecimen other)
