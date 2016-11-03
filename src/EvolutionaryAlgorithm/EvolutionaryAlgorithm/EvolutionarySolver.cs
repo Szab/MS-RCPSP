@@ -111,10 +111,8 @@ namespace Szab.EvolutionaryAlgorithm
             population.AddRange(newPopulation);
 
             List<T> children = this.CrossOverPopulation(population, random);
-            this.MutatePopulation(children, random);
-
             population.AddRange(children);
-
+            this.MutatePopulation(population, random);
 
             int populationSize = population.Count;
         }

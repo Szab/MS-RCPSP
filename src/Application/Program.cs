@@ -17,7 +17,7 @@ namespace Application
         {
             List<double[]> partialQualities = new List<double[]>();
 
-            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\100_5_64_15.def";
+            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\100_5_22_15.def";
             ProjectSpecification project = FilesManager.ParseProjectData(filePath);
 
             //MSRCPSPTabuSolver solver = new MSRCPSPTabuSolver(project)
@@ -27,12 +27,12 @@ namespace Application
             //    MaxStepsWithoutChange = 30
             //};
 
-            MSRCPSPSolver solver = new MSRCPSPSolver(project, 500)
+            MSRCPSPSolver solver = new MSRCPSPSolver(project, 100)
             {
-                MutationProbability = 0.04,
+                MutationProbability = 0.05,
                 CrossoverProbability = 0.65,
                 PercentInGroup = 0.05,
-                PopulationSize = 80
+                PopulationSize = 100
             };
 
             solver.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)
