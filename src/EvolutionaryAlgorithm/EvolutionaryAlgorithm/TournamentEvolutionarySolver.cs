@@ -25,7 +25,7 @@ namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
 
         protected override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities)
         {
-            List<T> newPopulation = new List<T>();
+            List<Tuple<T, double>> newPopulation = new List<Tuple<T, double>>();
 
             int step = (int)Math.Ceiling(qualities.Count() * this.PercentInGroup);
             int groups = (int)Math.Ceiling(qualities.Count() / (double)step);
@@ -33,13 +33,13 @@ namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
 
             for(var i = 0; i < qualities.Count(); i = i + step)
             {
-                IEnumerable<T> subpopulation = qualities.Skip(i).Take(step).OrderByDescending(x => x.Item2)
-                                                .Take(winnersInGroup).Select(x => x.Item1);
+                IEnumerable<Tuple<T, double>> subpopulation = qualities.Skip(i).Take(step).OrderByDescending(x => x.Item2)
+                                                .Take(winnersInGroup);
 
                 newPopulation.AddRange(subpopulation);
             }
 
-            return newPopulation.Take(this.PopulationSize);
+            return newPopulation.OrderByDescending(x => x.Item2).Select(x => x.Item1).Take(this.PopulationSize);
         }
 
         public TournamentEvolutionarySolver() : base()

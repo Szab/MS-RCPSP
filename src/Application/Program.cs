@@ -17,26 +17,27 @@ namespace Application
         {
             List<double[]> partialQualities = new List<double[]>();
 
-            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\100_5_22_15.def";
+            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\100_5_64_15.def";
             ProjectSpecification project = FilesManager.ParseProjectData(filePath);
 
             //MSRCPSPTabuSolver solver = new MSRCPSPTabuSolver(project)
             //{
-            //    NumberOfSteps = 1000,
-            //    TabuSize = 100
+            //    NumberOfSteps = 500,
+            //    TabuSize = 200,
+            //    MaxStepsWithoutChange = 30
             //};
 
-            MSRCPSPSolver solver = new MSRCPSPSolver(project, 300)
+            MSRCPSPSolver solver = new MSRCPSPSolver(project, 500)
             {
-                MutationProbability = 0.025,
-                CrossoverProbability = 0.7,
+                MutationProbability = 0.04,
+                CrossoverProbability = 0.65,
                 PercentInGroup = 0.05,
-                PopulationSize = 50
+                PopulationSize = 80
             };
 
             solver.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)
             {
-                double worst = population.Min(x => x.RateQuality());
+                double worst = double.NaN; //population.Min(x => x.RateQuality());
                 double average = population.Average(x => x.RateQuality());
                 double best = population.Max(x => x.RateQuality());
                 Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, 1 / average, 1 / worst);

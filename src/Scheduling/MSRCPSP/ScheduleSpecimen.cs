@@ -38,7 +38,7 @@ namespace Szab.Scheduling.MSRCPSP
         {
             ScheduleSpecimen child = new ScheduleSpecimen(this.ProjectData, this.Tasks.Length);
 
-            int maxElementsToCopy = this.Tasks.Length / 2;
+            int maxElementsToCopy = this.Tasks.Length * 3 / 4;
             int endPosition = random.Next(this.Tasks.Length);
             int startPosition = random.Next(Math.Max(0, endPosition - maxElementsToCopy + 1), endPosition);
 

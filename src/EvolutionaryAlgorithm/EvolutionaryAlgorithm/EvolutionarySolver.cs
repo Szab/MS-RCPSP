@@ -38,7 +38,7 @@ namespace Szab.EvolutionaryAlgorithm
         protected abstract IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities);
         protected abstract IEnumerable<T> CreateInitialPopulation();
         
-        protected void CrossOverPopulation(List<T> population, Random randomGenerator)
+        protected List<T> CrossOverPopulation(List<T> population, Random randomGenerator)
         {
             Object addingLock = new Object();
             List<T> children = new List<T>();
@@ -63,14 +63,19 @@ namespace Szab.EvolutionaryAlgorithm
                 }
             });
 
-            population.AddRange(children);
+            return children;
         }
 
         protected void MutatePopulation(List<T> population, Random randomGenerator)
         {
             Parallel.ForEach(population, specimen =>
             {
-                double rand = randomGenerator.NextDouble();
+                double rand;
+
+                lock (randomGenerator)
+                {
+                    rand = randomGenerator.NextDouble();
+                }
 
                 if (rand < this.MutationProbability)
                 {
@@ -105,8 +110,11 @@ namespace Szab.EvolutionaryAlgorithm
             population.Clear();
             population.AddRange(newPopulation);
 
-            this.MutatePopulation(population, random);
-            this.CrossOverPopulation(population, random);
+            List<T> children = this.CrossOverPopulation(population, random);
+            this.MutatePopulation(children, random);
+
+            population.AddRange(children);
+
 
             int populationSize = population.Count;
         }
