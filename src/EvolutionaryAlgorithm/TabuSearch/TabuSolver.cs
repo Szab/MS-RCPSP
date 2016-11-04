@@ -86,7 +86,7 @@ namespace Szab.TabuSearch
 
                     lock (lockObj)
                     {
-                        bool pickBest = this.MaxStepsWithoutChange <= 0 || this.MaxStepsWithoutChange <= numStepsWithoutChange;
+                        bool pickBest = this.MaxStepsWithoutChange <= 0 || this.MaxStepsWithoutChange >= numStepsWithoutChange;
 
                         if (currentSolutionQuality < partialQuality && pickBest ||
                             currentSolutionQuality < partialQuality && partialQuality != lastSolutionQuality)
