@@ -77,18 +77,17 @@ namespace Szab.Scheduling.MSRCPSP
             return child;
         }
 
-        // Mutation operator: scramble random sequence
+        // Mutation operator: swap two random genes
         public void Mutate()
         {
+            int index1 = random.Next(this.Tasks.Length);
+            int index2 = random.Next(this.Tasks.Length);
+
+            Task temp = this.Tasks[index2];
+            this.Tasks[index2] = this.Tasks[index1];
+            this.Tasks[index1] = temp;
+
             quality = null;
-
-            int startIndex = random.Next(this.Tasks.Length - 1);
-            int endIndex = random.Next(startIndex + 1, this.Tasks.Length);
-
-            Task[] tasks = this.Tasks.Skip(startIndex).Take(endIndex - startIndex).ToArray();
-            tasks.Shuffle();
-
-            tasks.CopyTo(this.Tasks, startIndex);
         }
 
         public bool CheckEquality(ScheduleSpecimen other)
@@ -106,16 +105,13 @@ namespace Szab.Scheduling.MSRCPSP
 
         public IEnumerable<ScheduleSpecimen> GetNeighbours()
         {
-            int index = random.Next(this.Tasks.Length);
+            int numNeighbours = 30;
             List<ScheduleSpecimen> neighbours = new List<ScheduleSpecimen>();
 
-            for(int i = 0; i < this.Tasks.Length; i++)
+            for(int i = 0; i < numNeighbours; i++)
             {
                 ScheduleSpecimen neighbour = new ScheduleSpecimen(this);
-                neighbour.ProjectData = this.ProjectData;
-                Task temp = neighbour.Tasks[index];
-                neighbour.Tasks[index] = neighbour.Tasks[i];
-                neighbour.Tasks[i] = temp;
+                neighbour.Mutate();
                 neighbours.Add(neighbour);
             }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Szab.MetaheuristicsBase;
+using Szab.Metaheuristics.Tools;
 
 namespace Szab.EvolutionaryAlgorithm
 {
@@ -43,22 +44,25 @@ namespace Szab.EvolutionaryAlgorithm
             Object addingLock = new Object();
             List<T> children = new List<T>();
 
-            Parallel.For(0, population.Count - 1, index =>
+            Parallel.For(0, population.Count, index =>
             {
-                if (index % 2 == 0)
+                int secondParentIndex = randomGenerator.Next(population.Count);
+                double rand = randomGenerator.NextDouble();
+
+                if (population[secondParentIndex] == this)
                 {
-                    double rand = randomGenerator.NextDouble();
+                    secondParentIndex = (secondParentIndex + 1) % population.Count;
+                }
 
-                    if (rand < this.CrossoverProbability)
+                if (rand < this.CrossoverProbability)
+                {
+                    T firstParent = population[index];
+                    T secondParent = population[secondParentIndex];
+
+                    lock (addingLock)
                     {
-                        T firstParent = population[index];
-                        T secondParent = population[index + 1];
-
-                        lock (addingLock)
-                        {
-                            children.Add(firstParent.CrossOver(secondParent));
-                            children.Add(secondParent.CrossOver(firstParent));
-                        }
+                        children.Add(firstParent.CrossOver(secondParent));
+                        children.Add(secondParent.CrossOver(firstParent));
                     }
                 }
             });

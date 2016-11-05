@@ -29,17 +29,14 @@ namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
             List<Tuple<T, double>> qualitiesList = qualities.ToList();
             List<Tuple<T, double>> newPopulation = new List<Tuple<T, double>>();
 
-            int step = (int)Math.Ceiling(qualitiesList.Count * this.PercentInGroup);
-            int groups = (int)Math.Ceiling(qualitiesList.Count / (double)step);
-            int winnersInGroup = (int)Math.Ceiling(this.PopulationSize / (double)groups);
-            qualitiesList.Shuffle();
+            int specimenInGroup = (int)(qualitiesList.Count * this.PercentInGroup);
 
-            for(var i = 0; i < qualitiesList.Count; i = i + step)
+            while(newPopulation.Count < this.PopulationSize)
             {
-                IEnumerable<Tuple<T, double>> subpopulation = qualitiesList.Skip(i).Take(step).OrderByDescending(x => x.Item2)
-                                                .Take(winnersInGroup);
-
-                newPopulation.AddRange(subpopulation);
+                qualitiesList.Shuffle();
+                Tuple<T, double> winner = qualitiesList.Take(specimenInGroup).OrderByDescending(x => x.Item2).First();
+                qualitiesList.Remove(winner);
+                newPopulation.Add(winner);
             }
 
             return newPopulation.OrderByDescending(x => x.Item2).Select(x => x.Item1).Take(this.PopulationSize);

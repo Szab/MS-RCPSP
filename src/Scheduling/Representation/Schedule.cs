@@ -109,8 +109,8 @@ namespace Szab.Scheduling.Representation
 
         public TaskAssignment GetCollidingAssignment(Resource resource, int time, int to)
         {
-            return this.tasks.FirstOrDefault(x => x.Resource == resource && (time <= x.StartOffset && to >= x.StartOffset ||
-                                                                    time <= x.EndOffset && to >= x.EndOffset ||
+            return this.tasks.FirstOrDefault(x => x.Resource == resource && (time < x.StartOffset && to > x.StartOffset ||
+                                                                    time < x.EndOffset && to > x.EndOffset ||
                                                                     time >= x.StartOffset && to <= x.EndOffset ||
                                                                     time <= x.StartOffset && to >= x.EndOffset));
         }

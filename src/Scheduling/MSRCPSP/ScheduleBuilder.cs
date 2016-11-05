@@ -9,26 +9,30 @@ namespace Szab.Scheduling.MSRCPSP
 {
     public static class ScheduleBuilder
     {
-        private static int ScheduleTask(ProjectSpecification projectData, ScheduleSpecimen specimen, Task task, Schedule schedule)
+        private static bool ScheduleTask(ProjectSpecification projectData, ScheduleSpecimen specimen, Task task, Schedule schedule)
         {
             int offset = 1;
-            TaskAssignment existingAssignment = schedule.GetAssignmentByTask(task);
 
-            if (existingAssignment != null)
+            TaskAssignment currentAssignment = schedule.GetAssignmentByTask(task);
+
+            if (currentAssignment != null)
             {
-                return existingAssignment.EndOffset;
+                return true;
             }
 
             if (task.Predecessors.Count > 0)
             {
-                List<Task> predecessors = task.Predecessors.OrderBy(x => Array.IndexOf(specimen.Tasks, x)).ToList();
+                List<TaskAssignment> assignedPredecessors = task.Predecessors.Select(x => schedule.GetAssignmentByTask(x))
+                                                                             .Where(x => x != null).ToList();
 
-                for (int i = 0; i < predecessors.Count; i++)
+                if (assignedPredecessors.Count < task.Predecessors.Count)
                 {
-                    Task predecessor = predecessors[i];
-                    int newOffset = ScheduleBuilder.ScheduleTask(projectData, specimen, predecessor, schedule);
-
-                    offset = offset > newOffset ? offset : newOffset;
+                    return false;
+                }
+                else
+                {
+                    int latestPredecessorOffset = assignedPredecessors.Max(x => x.EndOffset);
+                    offset = latestPredecessorOffset;
                 }
             }
 
@@ -48,7 +52,7 @@ namespace Szab.Scheduling.MSRCPSP
                         resource = availableResource;
                         break;
                     }
-                    else if (earliestEndingCollision == null || collidingAssignment.EndOffset < earliestEndingCollision.EndOffset)
+                    else if (earliestEndingCollision == null || collidingAssignment.EndOffset <= earliestEndingCollision.EndOffset)
                     {
                         earliestEndingCollision = collidingAssignment;
                     }
@@ -56,24 +60,28 @@ namespace Szab.Scheduling.MSRCPSP
 
                 if (resource == null)
                 {
-                    offset = earliestEndingCollision.EndOffset + 1;
+                    offset = earliestEndingCollision.EndOffset;
                 }
             }
 
             TaskAssignment taskAssignment = new TaskAssignment(task, resource, offset);
             schedule.Add(taskAssignment);
 
-            return taskAssignment.EndOffset;
+            return true;
         }
 
         public static Schedule BuildScheduleFromSpecimen(ProjectSpecification projectData, ScheduleSpecimen specimen)
         {
             Schedule schedule = new Schedule();
 
-            for(int i = 0; i < specimen.Tasks.Length; i++)
+
+            while (schedule.GetAllAssignments().Count() != specimen.Tasks.Length)
             {
-                Task currentTask = specimen.Tasks[i];
-                ScheduleBuilder.ScheduleTask(projectData, specimen, currentTask, schedule);
+                for (int i = 0; i < specimen.Tasks.Length; i++)
+                {
+                    Task currentTask = specimen.Tasks[i];
+                    ScheduleBuilder.ScheduleTask(projectData, specimen, currentTask, schedule);
+                }
             }
 
             return schedule;
