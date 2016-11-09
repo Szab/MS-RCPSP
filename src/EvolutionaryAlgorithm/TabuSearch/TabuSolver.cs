@@ -10,7 +10,7 @@ namespace Szab.TabuSearch
     public class TabuSolver<T> : ISolver<T> where T : class, ITabuSolution<T>
     {
         public delegate void StepEventHandler(int numGeneration, T currentSolution, T currentBestSolution);
-        public StepEventHandler OnNextGeneration;
+        public StepEventHandler OnNextStep;
 
         public T InitialSolution
         {
@@ -54,6 +54,33 @@ namespace Szab.TabuSearch
             return false;
         } 
 
+        private T GetBestNeighbour(IEnumerable<T> neigbours, int numStepsWithoutChange, double lastSolutionQuality)
+        {
+            Object lockObj = new Object();
+            T currentSolution = null;
+            double currentSolutionQuality = double.NegativeInfinity;
+
+            Parallel.ForEach(neigbours, item =>
+            {
+                double partialQuality = item.RateQuality();
+
+                lock (lockObj)
+                {
+                    bool pickBest = this.MaxStepsWithoutChange <= 0 || this.MaxStepsWithoutChange >= numStepsWithoutChange;
+
+                    if (currentSolutionQuality < partialQuality && pickBest ||
+                        currentSolutionQuality < partialQuality && partialQuality != lastSolutionQuality)
+                    {
+                        currentSolution = item;
+                        currentSolutionQuality = partialQuality;
+                    }
+                }
+
+            });
+
+            return currentSolution;
+        }
+
         public T Solve()
         {
             T finalSolution = this.InitialSolution;
@@ -66,10 +93,10 @@ namespace Szab.TabuSearch
             int numStepsWithoutChange = 0;
 
             List<T> tabuList = new List<T>();
-            Object lockObj = new Object();
 
             while (!this.CheckIfFinished(numStep, finalSolution))
             {
+                // Get neighbours of the current solution
                 IEnumerable<T> neigbours = lastSolution.GetNeighbours().Where(x => !this.CheckIfPresentInTabuList(x, tabuList));
 
                 if (neigbours.Count() == 0)
@@ -77,27 +104,11 @@ namespace Szab.TabuSearch
                     break;
                 }
 
-                T currentSolution = null;
-                double currentSolutionQuality = double.NegativeInfinity;
+                // Calculate where to go next
+                T currentSolution = this.GetBestNeighbour(neigbours, numStepsWithoutChange, lastSolutionQuality);
+                double currentSolutionQuality = currentSolution.RateQuality();
 
-                Parallel.ForEach(neigbours, item =>
-                {
-                    double partialQuality = item.RateQuality();
-
-                    lock (lockObj)
-                    {
-                        bool pickBest = this.MaxStepsWithoutChange <= 0 || this.MaxStepsWithoutChange >= numStepsWithoutChange;
-
-                        if (currentSolutionQuality < partialQuality && pickBest ||
-                            currentSolutionQuality < partialQuality && partialQuality != lastSolutionQuality)
-                        {
-                            currentSolution = item;
-                            currentSolutionQuality = partialQuality;
-                        }
-                    }
-
-                });
-
+                // Increase the counter if quality didn't change
                 if (lastSolutionQuality == currentSolutionQuality)
                 {
                     numStepsWithoutChange++;
@@ -107,6 +118,7 @@ namespace Szab.TabuSearch
                     numStepsWithoutChange = 0;
                 }
 
+                // Check if the current solution is the best one yet
                 lastSolution = currentSolution;
                 lastSolutionQuality = currentSolutionQuality;
 
@@ -119,9 +131,9 @@ namespace Szab.TabuSearch
                 tabuList.Insert(0, lastSolution);
                 tabuList = tabuList.Take(this.TabuSize).ToList();
 
-                if(this.OnNextGeneration != null)
+                if(this.OnNextStep != null)
                 {
-                    this.OnNextGeneration(numStep, lastSolution, finalSolution);
+                    this.OnNextStep(numStep, lastSolution, finalSolution);
                 }
 
                 numStep++;

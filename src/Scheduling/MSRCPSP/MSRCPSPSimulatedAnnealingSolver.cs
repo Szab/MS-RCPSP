@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Szab.Scheduling.Representation;
+using Szab.SimulatedAnnealing;
 using Szab.Extensions;
-using Szab.TabuSearch;
 
 namespace Szab.Scheduling.MSRCPSP
 {
-    public class MSRCPSPTabuSolver : TabuSolver<ScheduleSpecimen>
+    public class MSRCPSPSimulatedAnnealingSolver : SimulatedAnnealingSolver<ScheduleSpecimen>
     {
         public ProjectSpecification ProjectData
         {
@@ -35,14 +35,14 @@ namespace Szab.Scheduling.MSRCPSP
             return best;
         }
 
-        public MSRCPSPTabuSolver(ScheduleSpecimen initialSolution, ProjectSpecification project) : base(initialSolution)
+        public MSRCPSPSimulatedAnnealingSolver(ScheduleSpecimen initialSolution, ProjectSpecification project) : base(initialSolution)
         {
             this.ProjectData = project;
         }
 
-        public MSRCPSPTabuSolver(ProjectSpecification project) : this(MSRCPSPTabuSolver.GetRandomSpecimen(project), project) 
+        public MSRCPSPSimulatedAnnealingSolver(ProjectSpecification project) : this(MSRCPSPSimulatedAnnealingSolver.GetRandomSpecimen(project), project) 
         {
-            
+
         }
     }
 }

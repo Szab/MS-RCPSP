@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using Szab.EvolutionaryAlgorithm.SelectionSpecific;
 using Szab.Scheduling.Representation;
-using Szab.Scheduling.Tools;
+using Szab.Extensions;
 
 namespace Szab.Scheduling.MSRCPSP
 {
-    public class MSRCPSPSolver : TournamentEvolutionarySolver<ScheduleSpecimen>
+    public class MSRCPSPEvolutionarySolver : TournamentEvolutionarySolver<ScheduleSpecimen>
     {
         public ProjectSpecification ProjectData
         {
@@ -44,7 +44,7 @@ namespace Szab.Scheduling.MSRCPSP
             return initialPopulation;
         }
 
-        public MSRCPSPSolver(ProjectSpecification projectData, int maxGenerations)
+        public MSRCPSPEvolutionarySolver(ProjectSpecification projectData, int maxGenerations)
         {
             this.ProjectData = projectData;
             this.MaxGenerations = maxGenerations;

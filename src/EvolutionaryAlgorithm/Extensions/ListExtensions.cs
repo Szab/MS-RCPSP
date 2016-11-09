@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Szab.Metaheuristics.Tools
+namespace Szab.Extensions
 {
-    public static class ListExtensions
+    public static partial class IList
     {
         private static Random rng = new Random(Guid.NewGuid().GetHashCode());
 

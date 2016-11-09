@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Szab.MetaheuristicsBase;
-using Szab.Metaheuristics.Tools;
+using Szab.Extensions;
 
 namespace Szab.EvolutionaryAlgorithm
 {

@@ -5,11 +5,12 @@ using System.Text;
 using Szab.Scheduling.Representation;
 using Szab.EvolutionaryAlgorithm;
 using Szab.TabuSearch;
+using Szab.SimulatedAnnealing;
 using Szab.Scheduling.Tools;
 
 namespace Szab.Scheduling.MSRCPSP
 {
-    public class ScheduleSpecimen : ISpecimen<ScheduleSpecimen>, ITabuSolution<ScheduleSpecimen>
+    public class ScheduleSpecimen : ISpecimen<ScheduleSpecimen>, ITabuSolution<ScheduleSpecimen>, IAnnealingSolution<ScheduleSpecimen>
     {
         private static Random random = new Random(Guid.NewGuid().GetHashCode());
 

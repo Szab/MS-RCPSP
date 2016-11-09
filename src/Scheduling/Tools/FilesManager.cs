@@ -9,6 +9,7 @@ using System.Globalization;
 using Szab.EvolutionaryAlgorithm;
 using Szab.Scheduling.MSRCPSP;
 using Szab.TabuSearch;
+using Szab.SimulatedAnnealing;
 
 namespace Szab.Scheduling.Tools
 {
@@ -194,7 +195,7 @@ namespace Szab.Scheduling.Tools
             return statisticsBuilder.ToString();
         }
 
-        private static string CreateRunSummary(string filePath, MSRCPSPSolver solver, Schedule result)
+        private static string CreateRunSummary(string filePath, MSRCPSPEvolutionarySolver solver, Schedule result)
         {
             StringBuilder builder = new StringBuilder();
 
@@ -231,7 +232,24 @@ namespace Szab.Scheduling.Tools
             return builder.ToString();
         }
 
-        public static void SaveResults(string path, ProjectSpecification project, MSRCPSPSolver solver, Schedule result, List<double[]> functionChange)
+        private static string CreateRunSummary(string filePath, SimulatedAnnealingSolver<ScheduleSpecimen> solver, Schedule result)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.AppendLine("File: " + filePath);
+            builder.AppendLine("Metaheuristic: Simulated Annealing");
+            builder.AppendLine("Initial temperature: " + solver.InitialTemperature);
+            builder.AppendLine("Max iterations: " + solver.MaxIterations);
+            builder.AppendLine();
+            builder.AppendLine("Result duration: " + result.Length);
+            builder.AppendLine("Result cost: " + result.SummaryCost);
+            builder.AppendLine("========================================");
+            builder.Append(FilesManager.SerializeSchedule(result));
+
+            return builder.ToString();
+        }
+
+        public static void SaveResults(string path, ProjectSpecification project, MSRCPSPEvolutionarySolver solver, Schedule result, List<double[]> functionChange)
         {
             string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
             string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
@@ -248,6 +266,22 @@ namespace Szab.Scheduling.Tools
         }
 
         public static void SaveResults(string path, ProjectSpecification project, TabuSolver<ScheduleSpecimen> solver, Schedule result, List<double[]> functionChange)
+        {
+            string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
+            string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
+            string baseFileName = Path.GetFileName(path);
+
+            Directory.CreateDirectory(workingPath);
+            string serializedResult = FilesManager.SerializeSchedule(result);
+            string qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+            string runSummary = FilesManager.CreateRunSummary(path, solver, result);
+
+            FilesManager.SaveToFile(workingPath + "/" + baseFileName + ".sol", serializedResult);
+            FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+            FilesManager.SaveToFile(workingPath + "/RunSummary.txt", runSummary);
+        }
+
+        public static void SaveResults(string path, ProjectSpecification project, SimulatedAnnealingSolver<ScheduleSpecimen> solver, Schedule result, List<double[]> functionChange)
         {
             string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
             string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
