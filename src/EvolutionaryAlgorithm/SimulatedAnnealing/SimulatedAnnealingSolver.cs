@@ -11,7 +11,7 @@ namespace Szab.SimulatedAnnealing
     {
         private Random rand = new Random(Guid.NewGuid().GetHashCode());
 
-        public delegate void StepEventHandler(int numGeneration, T currentSolution, T currentBestSolution);
+        public delegate void StepEventHandler(int numGeneration, T currentSolution, T currentBestSolution, double probability);
         public StepEventHandler OnNextStep;
 
         public T InitialSolution
@@ -43,7 +43,7 @@ namespace Szab.SimulatedAnnealing
             double lastQuality = 1/last.RateQuality();
             double currentQuality = 1/current.RateQuality();
 
-            return 1/(1 + Math.Pow(Math.E, (currentQuality - lastQuality) / currentTemperature));
+            return Math.Pow(Math.E, (lastQuality - currentQuality) * 30 / currentTemperature);
         }
 
         public T Solve()
@@ -62,15 +62,10 @@ namespace Szab.SimulatedAnnealing
             {
                 step++;
 
-                if (this.OnNextStep != null)
-                {
-                    this.OnNextStep(step, current, best);
-                }
+                List<T> neighbours = best.GetNeighbours().OrderBy(x => 1/x.RateQuality()).ToList();
+                //int neighbourIndex = rand.Next(neighbours.Count);
 
-                List<T> neighbours = best.GetNeighbours().ToList();
-                int neighbourIndex = rand.Next(neighbours.Count);
-
-                T neighbour = neighbours[neighbourIndex];
+                T neighbour = neighbours[0];
                 double neighbourQuality = 1/neighbour.RateQuality();
 
                 double changeProbability = this.CalculateProbability(current, neighbour, temperature);
@@ -93,7 +88,15 @@ namespace Szab.SimulatedAnnealing
                     bestQuality = neighbourQuality;
                 }
 
-                temperature = this.InitialTemperature * (1 - (double)step / this.MaxIterations);
+                //temperature = this.InitialTemperature * (1 - step/this.MaxIterations);
+                double a = (Math.Log(this.InitialTemperature, Math.E) - Math.Log(0.1, Math.E)) / this.MaxIterations;
+                double b = Math.Pow(Math.E, -(step * a));
+                temperature = this.InitialTemperature * b;
+
+                if (this.OnNextStep != null)
+                {
+                    this.OnNextStep(step, current, best, temperature);
+                }
             }
 
             return best;

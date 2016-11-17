@@ -37,9 +37,8 @@ namespace Application
 
             MSRCPSPSimulatedAnnealingSolver saSolver = new MSRCPSPSimulatedAnnealingSolver(project)
             {
-                MaxIterations = 400,
-                InitialTemperature = 10,
-                MinTemperature = 0.005
+                MaxIterations = 800,
+                InitialTemperature = 2500,
             };
             
             eaSolver.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)
@@ -60,17 +59,17 @@ namespace Application
                 partialQualities.Add(new double[] { worst, average, best });
             };
 
-            saSolver.OnNextStep += delegate (int numGeneration, ScheduleSpecimen current, ScheduleSpecimen bestSolution)
+            saSolver.OnNextStep += delegate (int numGeneration, ScheduleSpecimen current, ScheduleSpecimen bestSolution, double probability)
             {
                 double worst = current.RateQuality();
-                double average = double.NaN;
+                double average = probability;
                 double best = bestSolution.RateQuality();
-                Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, 1 / average, 1 / worst);
+                Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, average, 1 / worst);
                 partialQualities.Add(new double[] { worst, average, best });
             };
 
             //MSRCPSPTabuSolver solver = tabuSolver;
-            //MSRCPSPSolver solver = eaSolver;
+            //MSRCPSPEvolutionarySolver solver = eaSolver;
             MSRCPSPSimulatedAnnealingSolver solver = saSolver;
             ScheduleSpecimen bestSpecimen = solver.Solve();
             Schedule schedule = ScheduleBuilder.BuildScheduleFromSpecimen(project, bestSpecimen);
