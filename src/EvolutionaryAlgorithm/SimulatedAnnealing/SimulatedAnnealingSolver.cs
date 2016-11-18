@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Szab.MetaheuristicsBase;
+using Szab.Extensions;
 
 namespace Szab.SimulatedAnnealing
 {
@@ -43,7 +44,7 @@ namespace Szab.SimulatedAnnealing
             double lastQuality = 1/last.RateQuality();
             double currentQuality = 1/current.RateQuality();
 
-            return Math.Pow(Math.E, (lastQuality - currentQuality) * 30 / currentTemperature);
+            return Math.Pow(Math.E, (lastQuality - currentQuality) / currentTemperature);
         }
 
         public T Solve()
@@ -62,7 +63,9 @@ namespace Szab.SimulatedAnnealing
             {
                 step++;
 
-                List<T> neighbours = best.GetNeighbours().OrderBy(x => 1/x.RateQuality()).ToList();
+                List<T> neighbours = best.GetNeighbours().ToList();
+                neighbours.Shuffle();
+
                 //int neighbourIndex = rand.Next(neighbours.Count);
 
                 T neighbour = neighbours[0];
@@ -89,7 +92,7 @@ namespace Szab.SimulatedAnnealing
                 }
 
                 //temperature = this.InitialTemperature * (1 - step/this.MaxIterations);
-                double a = (Math.Log(this.InitialTemperature, Math.E) - Math.Log(0.1, Math.E)) / this.MaxIterations;
+                double a = (Math.Log(this.InitialTemperature, Math.E) - Math.Log(0.45, Math.E)) / this.MaxIterations;
                 double b = Math.Pow(Math.E, -(step * a));
                 temperature = this.InitialTemperature * b;
 

@@ -32,13 +32,13 @@ namespace Application
                 MutationProbability = 0.015,
                 CrossoverProbability = 0.65,
                 PercentInGroup = 0.05,
-                PopulationSize = 200
+                PopulationSize = 120
             };
 
             MSRCPSPSimulatedAnnealingSolver saSolver = new MSRCPSPSimulatedAnnealingSolver(project)
             {
-                MaxIterations = 800,
-                InitialTemperature = 2500,
+                MaxIterations = 1000,
+                InitialTemperature = 3000,
             };
             
             eaSolver.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)
@@ -69,8 +69,8 @@ namespace Application
             };
 
             //MSRCPSPTabuSolver solver = tabuSolver;
-            //MSRCPSPEvolutionarySolver solver = eaSolver;
-            MSRCPSPSimulatedAnnealingSolver solver = saSolver;
+            MSRCPSPEvolutionarySolver solver = eaSolver;
+            //MSRCPSPSimulatedAnnealingSolver solver = saSolver;
             ScheduleSpecimen bestSpecimen = solver.Solve();
             Schedule schedule = ScheduleBuilder.BuildScheduleFromSpecimen(project, bestSpecimen);
             FilesManager.SaveResults(filePath, project, solver, schedule, partialQualities);

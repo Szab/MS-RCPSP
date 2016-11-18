@@ -106,7 +106,7 @@ namespace Szab.Scheduling.MSRCPSP
 
         public IEnumerable<ScheduleSpecimen> GetNeighbours()
         {
-            int numNeighbours = 3;
+            int numNeighbours = 5;
             List<ScheduleSpecimen> neighbours = new List<ScheduleSpecimen>();
 
             for(int i = 0; i < numNeighbours; i++)
