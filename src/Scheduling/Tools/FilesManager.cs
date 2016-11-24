@@ -249,7 +249,7 @@ namespace Szab.Scheduling.Tools
             return builder.ToString();
         }
 
-        public static void SaveResults(string path, ProjectSpecification project, MSRCPSPEvolutionarySolver solver, Schedule result, List<double[]> functionChange)
+        public static void SaveResults(string path, ProjectSpecification project, MSRCPSPEvolutionarySolver solver, Schedule result, List<double[]> functionChange = null)
         {
             string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
             string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
@@ -257,15 +257,25 @@ namespace Szab.Scheduling.Tools
 
             Directory.CreateDirectory(workingPath);
             string serializedResult = FilesManager.SerializeSchedule(result);
-            string qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+
+            string qualitiesResult = null;
+            if (functionChange != null)
+            {
+                qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+            }
             string runSummary = FilesManager.CreateRunSummary(path, solver, result);
 
             FilesManager.SaveToFile(workingPath + "/" + baseFileName + ".sol", serializedResult);
-            FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+
+            if (qualitiesResult != null)
+            {
+                FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+            }
+
             FilesManager.SaveToFile(workingPath + "/RunSummary.txt", runSummary);
         }
 
-        public static void SaveResults(string path, ProjectSpecification project, TabuSolver<ScheduleSpecimen> solver, Schedule result, List<double[]> functionChange)
+        public static void SaveResults(string path, ProjectSpecification project, TabuSolver<ScheduleSpecimen> solver, Schedule result, List<double[]> functionChange = null)
         {
             string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
             string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
@@ -273,15 +283,25 @@ namespace Szab.Scheduling.Tools
 
             Directory.CreateDirectory(workingPath);
             string serializedResult = FilesManager.SerializeSchedule(result);
-            string qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+
+            string qualitiesResult = null;
+            if (functionChange != null)
+            {
+                qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+            }
             string runSummary = FilesManager.CreateRunSummary(path, solver, result);
 
             FilesManager.SaveToFile(workingPath + "/" + baseFileName + ".sol", serializedResult);
-            FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+
+            if (qualitiesResult != null)
+            {
+                FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+            }
+
             FilesManager.SaveToFile(workingPath + "/RunSummary.txt", runSummary);
         }
 
-        public static void SaveResults(string path, ProjectSpecification project, SimulatedAnnealingSolver<ScheduleSpecimen> solver, Schedule result, List<double[]> functionChange)
+        public static void SaveResults(string path, ProjectSpecification project, SimulatedAnnealingSolver<ScheduleSpecimen> solver, Schedule result, List<double[]> functionChange = null)
         {
             string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
             string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
@@ -289,11 +309,22 @@ namespace Szab.Scheduling.Tools
 
             Directory.CreateDirectory(workingPath);
             string serializedResult = FilesManager.SerializeSchedule(result);
-            string qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+
+            string qualitiesResult = null;
+            if (functionChange != null)
+            {
+                qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+            }
+
             string runSummary = FilesManager.CreateRunSummary(path, solver, result);
 
             FilesManager.SaveToFile(workingPath + "/" + baseFileName + ".sol", serializedResult);
-            FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+
+            if (qualitiesResult != null)
+            {
+                FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+            }
+
             FilesManager.SaveToFile(workingPath + "/RunSummary.txt", runSummary);
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Szab.EvolutionaryAlgorithm;
 using Szab.MetaheuristicsBase;
 using Szab.Scheduling.MSRCPSP;
 
@@ -14,14 +15,17 @@ namespace Application
 
         private double getStandardDeviation(List<double> doubleList)
         {
-            double average = doubleList.Average();
-            double sumOfDerivation = 0;
+            double M = 0.0;
+            double S = 0.0;
+            int k = 1;
             foreach (double value in doubleList)
             {
-                sumOfDerivation += (value) * (value);
+                double tmpM = M;
+                M += (value - tmpM) / k;
+                S += (value - tmpM) * (value - M);
+                k++;
             }
-            double sumOfDerivationAverage = sumOfDerivation / (doubleList.Count - 1);
-            return Math.Sqrt(sumOfDerivationAverage - (average * average));
+            return Math.Sqrt(S / (k - 2));
         }
 
         public BenchmarkResult Start(int attempts)
