@@ -10,7 +10,7 @@ namespace Szab.EvolutionaryAlgorithm
 {
     public abstract class EvolutionarySolver<T> : ISolver<T> where T : class, ISpecimen<T>
     {
-
+        protected static Random random = new Random(Guid.NewGuid().GetHashCode());
         private double mutationProbability;
         private double crossoverProbability;
 
@@ -36,7 +36,7 @@ namespace Szab.EvolutionaryAlgorithm
         }
 
         protected abstract bool CheckIfFinished(int numGeneration, IEnumerable<T> population);
-        protected abstract IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities);
+        protected abstract IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities, int numGeneration);
         protected abstract IEnumerable<T> CreateInitialPopulation();
         
         protected List<T> CrossOverPopulation(List<T> population, Random randomGenerator)
@@ -107,10 +107,10 @@ namespace Szab.EvolutionaryAlgorithm
             return qualities;
         }
 
-        protected virtual void PerformStep(List<T> population, Random random)
+        protected virtual void PerformStep(List<T> population, int numGeneration, Random random)
         {
             IEnumerable<Tuple<T, double>> qualities = this.CalculateQualities(population);
-            IEnumerable<T> newPopulation = this.SelectNewPopulation(qualities).Take(this.PopulationSize);
+            IEnumerable<T> newPopulation = this.SelectNewPopulation(qualities, numGeneration).Take(this.PopulationSize);
             population.Clear();
             population.AddRange(newPopulation);
 
@@ -134,7 +134,7 @@ namespace Szab.EvolutionaryAlgorithm
                     this.OnNextGeneration(numGeneration, population);
                 }
 
-                this.PerformStep(population, random);
+                this.PerformStep(population, numGeneration, random);
 
                 numGeneration++;
             }

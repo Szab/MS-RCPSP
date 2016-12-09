@@ -17,13 +17,13 @@ namespace Application
         {
             List<double[]> partialQualities = new List<double[]>();
 
-            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\dataset_def\100_20_46_15.def";
+            string filePath = @"C:\Users\Szab\Desktop\MSRCPSP\dataset_def\100_5_22_15.def";
             ProjectSpecification project = FilesManager.ParseProjectData(filePath);
 
             MSRCPSPTabuSolver tabuSolver = new MSRCPSPTabuSolver(project)
             {
-                NumberOfSteps = 3000,
-                TabuSize = 50,
+                NumberOfSteps = 500,
+                TabuSize = 150,
                 MaxStepsWithoutChange = 0
             };
 
@@ -41,6 +41,24 @@ namespace Application
                 InitialTemperature = 5000,
             };
 
+            MSRCPSPTabuCorrectedEASolver hybrid1 = new MSRCPSPTabuCorrectedEASolver(project, 100)
+            {
+                MutationProbability = 0.015,
+                CrossoverProbability = 0.60,
+                PercentInGroup = 0.05,
+                PopulationSize = 100,
+                TabuSolver = tabuSolver
+            };
+
+            MSRCPSPAnnealedEASolver hybrid2 = new MSRCPSPAnnealedEASolver(project, 100)
+            {
+                InitialTemperature = 5000,
+                MutationProbability = 0.015,
+                CrossoverProbability = 0.60,
+                PercentInGroup = 0.05,
+                PopulationSize = 100
+            };
+
             //eaSolver.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)
             //{
             //    double worst = population.Min(x => x.RateQuality());
@@ -50,33 +68,53 @@ namespace Application
             //    partialQualities.Add(new double[] { worst, average, best });
             //};
 
-            ////tabuSolver.OnNextStep += delegate (int numGeneration, ScheduleSpecimen current, ScheduleSpecimen bestSolution)
-            ////{
-            ////    double worst = current.RateQuality();
-            ////    double average = double.NaN;
-            ////    double best = bestSolution.RateQuality();
-            ////    Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, 1 / average, 1 / worst);
-            ////    partialQualities.Add(new double[] { worst, average, best });
-            ////};
+            //hybrid2.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)
+            //{
+            //    double worst = population.Min(x => x.RateQuality());
+            //    double average = population.Average(x => x.RateQuality());
+            //    double best = population.Max(x => x.RateQuality());
+            //    Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, 1 / average, 1 / worst);
+            //    partialQualities.Add(new double[] { worst, average, best });
+            //};
 
-            ////saSolver.OnNextStep += delegate (int numGeneration, ScheduleSpecimen current, ScheduleSpecimen bestSolution, double probability)
-            ////{
-            ////    double worst = current.RateQuality();
-            ////    double average = probability;
-            ////    double best = bestSolution.RateQuality();
-            ////    Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, average, 1 / worst);
-            ////    partialQualities.Add(new double[] { worst, average, best });
-            ////};
+            tabuSolver.OnNextStep += delegate (int numGeneration, ScheduleSpecimen current, ScheduleSpecimen bestSolution)
+            {
+                double worst = double.NaN;
+                double average = current.RateQuality();
+                double best = bestSolution.RateQuality();
+                Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, 1 / average, 1 / worst);
+                partialQualities.Add(new double[] { worst, average, best });
+            };
+
+            //saSolver.OnNextStep += delegate (int numGeneration, ScheduleSpecimen current, ScheduleSpecimen bestSolution, double probability)
+            //{
+            //    double worst = current.RateQuality();
+            //    double average = probability;
+            //    double best = bestSolution.RateQuality();
+            //    Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, average, 1 / worst);
+            //    partialQualities.Add(new double[] { worst, average, best });
+            //};
+
+            hybrid1.OnNextGeneration += delegate (int numGeneration, IEnumerable<ScheduleSpecimen> population)
+            {
+                double worst = population.Min(x => x.RateQuality());
+                double average = population.Average(x => x.RateQuality());
+                double best = population.Max(x => x.RateQuality());
+                Console.WriteLine("New generation: {0}, Best: {1}, Average: {2}, Worst: {3}", numGeneration + 1, 1 / best, 1 / average, 1 / worst);
+                partialQualities.Add(new double[] { worst, average, best });
+            };
 
             //MSRCPSPTabuSolver solver = tabuSolver;
             //MSRCPSPEvolutionarySolver solver = eaSolver;
-            ////MSRCPSPSimulatedAnnealingSolver solver = saSolver;
+            //MSRCPSPSimulatedAnnealingSolver solver = saSolver;
+            //MSRCPSPTabuCorrectedEASolver solver = hybrid1;
+            //MSRCPSPAnnealedEASolver solver = hybrid2;
             //ScheduleSpecimen bestSpecimen = solver.Solve();
             //Schedule schedule = ScheduleBuilder.BuildScheduleFromSpecimen(project, bestSpecimen);
             //FilesManager.SaveResults(filePath, project, solver, schedule, partialQualities);
 
-            Benchmark bench = new Benchmark(tabuSolver);
-            BenchmarkResult res = bench.Start(10);
+            Benchmark bench = new Benchmark(hybrid2);
+            BenchmarkResult res = bench.Start(40);
 
             Console.WriteLine("Results for {0}", filePath);
             Console.WriteLine("=============================");
@@ -91,7 +129,7 @@ namespace Application
 
             FilesManager.SaveResults(filePath, project, eaSolver, ScheduleBuilder.BuildScheduleFromSpecimen(project, res.BestSpecimen));
 
-            Console.WriteLine();
+            //Console.WriteLine();
             Console.ReadLine();
         }
     }

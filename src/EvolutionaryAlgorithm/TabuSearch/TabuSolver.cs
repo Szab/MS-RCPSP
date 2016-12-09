@@ -15,7 +15,7 @@ namespace Szab.TabuSearch
         public T InitialSolution
         {
             get;
-            private set;
+            set;
         }
 
         public int NumberOfSteps

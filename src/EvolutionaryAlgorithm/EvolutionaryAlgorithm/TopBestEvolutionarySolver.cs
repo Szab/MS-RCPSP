@@ -9,7 +9,7 @@ namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
 {
     public abstract class TopBestEvolutionarySolver<T> : EvolutionarySolver<T> where T : class, ISpecimen<T>
     {
-        protected override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities)
+        protected override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities, int numGeneration)
         {
             return qualities.OrderByDescending(x => x.Item2).Take(this.PopulationSize).Select(x => x.Item1);
         }

@@ -42,6 +42,8 @@
   <ItemGroup>
     <Compile Include="EvolutionaryAlgorithm\EvolutionarySolver.cs" />
     <Compile Include="Base\ISolution.cs" />
+    <Compile Include="Hybrids\AnnealedTournamentEvolutionarySolver.cs" />
+    <Compile Include="Hybrids\TabuCorrectedEvolutionarySolver.cs" />
     <Compile Include="SimulatedAnnealing\IAnnealingSolution.cs" />
     <Compile Include="SimulatedAnnealing\SimulatedAnnealingSolver.cs" />
     <Compile Include="TabuSearch\ITabuSolution.cs" />

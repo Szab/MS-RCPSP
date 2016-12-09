@@ -60,7 +60,7 @@ namespace Szab.Scheduling.MSRCPSP
 
                 if (resource == null)
                 {
-                    offset = earliestEndingCollision.EndOffset;
+                    offset = earliestEndingCollision.EndOffset + 1;
                 }
             }
 

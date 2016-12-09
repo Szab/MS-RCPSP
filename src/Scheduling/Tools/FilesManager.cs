@@ -215,6 +215,46 @@ namespace Szab.Scheduling.Tools
             return builder.ToString();
         }
 
+        private static string CreateRunSummary(string filePath, MSRCPSPAnnealedEASolver solver, Schedule result)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.AppendLine("File: " + filePath);
+            builder.AppendLine("Metaheuristic: Evolutionary algorithm");
+            builder.AppendLine("Number of generations: " + solver.MaxGenerations);
+            builder.AppendLine("Population size: " + solver.PopulationSize);
+            builder.AppendLine("Percent of population in a tournament group: " + solver.PercentInGroup);
+            builder.AppendLine("Crossover probability: " + solver.CrossoverProbability);
+            builder.AppendLine("Mutation probability: " + solver.MutationProbability);
+            builder.AppendLine();
+            builder.AppendLine("Result duration: " + result.Length);
+            builder.AppendLine("Result cost: " + result.SummaryCost);
+            builder.AppendLine("========================================");
+            builder.Append(FilesManager.SerializeSchedule(result));
+
+            return builder.ToString();
+        }
+
+        private static string CreateRunSummary(string filePath, MSRCPSPTabuCorrectedEASolver solver, Schedule result)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.AppendLine("File: " + filePath);
+            builder.AppendLine("Metaheuristic: Evolutionary algorithm");
+            builder.AppendLine("Number of generations: " + solver.MaxGenerations);
+            builder.AppendLine("Population size: " + solver.PopulationSize);
+            builder.AppendLine("Percent of population in a tournament group: " + solver.PercentInGroup);
+            builder.AppendLine("Crossover probability: " + solver.CrossoverProbability);
+            builder.AppendLine("Mutation probability: " + solver.MutationProbability);
+            builder.AppendLine();
+            builder.AppendLine("Result duration: " + result.Length);
+            builder.AppendLine("Result cost: " + result.SummaryCost);
+            builder.AppendLine("========================================");
+            builder.Append(FilesManager.SerializeSchedule(result));
+
+            return builder.ToString();
+        }
+
         private static string CreateRunSummary(string filePath, TabuSolver<ScheduleSpecimen> solver, Schedule result)
         {
             StringBuilder builder = new StringBuilder();
@@ -273,6 +313,60 @@ namespace Szab.Scheduling.Tools
             }
 
             FilesManager.SaveToFile(workingPath + "/RunSummary.txt", runSummary);
+        }
+
+        public static void SaveResults(string path, ProjectSpecification project, MSRCPSPAnnealedEASolver solver, Schedule result, List<double[]> functionChange = null)
+        {
+            string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
+            string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
+            string baseFileName = Path.GetFileName(path);
+
+            Directory.CreateDirectory(workingPath);
+            string serializedResult = FilesManager.SerializeSchedule(result);
+
+            string qualitiesResult = null;
+            if (functionChange != null)
+            {
+                qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+            }
+            string runSummary = FilesManager.CreateRunSummary(path, solver, result);
+
+            FilesManager.SaveToFile(workingPath + "/" + baseFileName + ".sol", serializedResult);
+
+            if (qualitiesResult != null)
+            {
+                FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+            }
+
+            FilesManager.SaveToFile(workingPath + "/RunSummary.txt", runSummary);
+        }
+
+        public static void SaveResults(string path, ProjectSpecification project, MSRCPSPTabuCorrectedEASolver solver, Schedule result, List<double[]> functionChange = null)
+        {
+            string folderName = DateTime.Now.ToString("yyyyMMdd hhmmss");
+            string workingPath = Directory.GetCurrentDirectory() + "/" + folderName;
+            string baseFileName = Path.GetFileName(path);
+
+            Directory.CreateDirectory(workingPath);
+            string serializedResult = FilesManager.SerializeSchedule(result);
+
+            string qualitiesResult = null;
+            if (functionChange != null)
+            {
+                qualitiesResult = FilesManager.SerializeResultQualities(functionChange);
+            }
+            string runSummary = FilesManager.CreateRunSummary(path, solver, result);
+            runSummary += "==========================================";
+            runSummary += FilesManager.CreateRunSummary(path, solver.TabuSolver, result);
+
+            FilesManager.SaveToFile(workingPath + "/" + baseFileName + ".sol", serializedResult);
+
+            if (qualitiesResult != null)
+            {
+                FilesManager.SaveToFile(workingPath + "/QualitiesHistory.csv", qualitiesResult);
+            }
+
+            FilesManager.SaveToFile(workingPath + "/RunSummary.txt", runSummary);          
         }
 
         public static void SaveResults(string path, ProjectSpecification project, TabuSolver<ScheduleSpecimen> solver, Schedule result, List<double[]> functionChange = null)

@@ -24,7 +24,7 @@ namespace Szab.EvolutionaryAlgorithm.SelectionSpecific
             }
         }
 
-        protected override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities)
+        protected override IEnumerable<T> SelectNewPopulation(IEnumerable<Tuple<T, double>> qualities, int numGeneration)
         {
             List<Tuple<T, double>> qualitiesList = qualities.ToList();
             List<Tuple<T, double>> newPopulation = new List<Tuple<T, double>>();

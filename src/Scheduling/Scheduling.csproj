@@ -40,8 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MSRCPSP\MSRCPSPAnnealedEASolver.cs" />
     <Compile Include="MSRCPSP\MSRCPSPSimulatedAnnealingSolver.cs" />
     <Compile Include="MSRCPSP\MSRCPSPEvolutionarySolver.cs" />
+    <Compile Include="MSRCPSP\MSRCPSPTabuCorrectedEASolver.cs" />
     <Compile Include="MSRCPSP\MSRCPSPTabuSolver.cs" />
     <Compile Include="MSRCPSP\ScheduleBuilder.cs" />
     <Compile Include="MSRCPSP\ScheduleSpecimen.cs" />
