@@ -34,11 +34,7 @@ namespace Szab.Scheduling.MSRCPSP
 
             for(int i = 0; i < this.PopulationSize; i++)
             {
-                ScheduleSpecimen newSpecimen = new ScheduleSpecimen(this.ProjectData, availableTasks.Count);
-                availableTasks.Shuffle();
-                availableTasks.CopyTo(newSpecimen.Tasks, 0);
-
-                initialPopulation.Add(newSpecimen);
+                initialPopulation.Add(ScheduleSpecimen.GetRandom(this.ProjectData, availableTasks.Count));
             }
 
             return initialPopulation;

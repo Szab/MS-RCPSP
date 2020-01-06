@@ -7,6 +7,7 @@ using Szab.EvolutionaryAlgorithm;
 using Szab.TabuSearch;
 using Szab.SimulatedAnnealing;
 using Szab.Scheduling.Tools;
+using Szab.Extensions;
 
 namespace Szab.Scheduling.MSRCPSP
 {
@@ -129,6 +130,15 @@ namespace Szab.Scheduling.MSRCPSP
         {
             this.Tasks = new Task[otherSpecimen.Tasks.Length];
             otherSpecimen.Tasks.CopyTo(this.Tasks, 0);
+        }
+
+        public static ScheduleSpecimen GetRandom(ProjectSpecification projectData, int size)
+        {
+            ScheduleSpecimen newSpecimen = new ScheduleSpecimen(projectData, size);
+            List<Task> availableTasks = projectData.Tasks.ToList();
+            availableTasks.Shuffle();
+            availableTasks.CopyTo(newSpecimen.Tasks, 0);
+            return newSpecimen;
         }
     }
 }
